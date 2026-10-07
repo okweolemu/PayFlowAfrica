@@ -33,7 +33,7 @@ export default defineConfig({
         "img-src 'self' data:",
         "font-src 'self'",
         `connect-src 'self'${formOrigin}`,
-        `form-action 'self' mailto:${formOrigin}`,
+        `form-action 'self'${formOrigin}`,
         "base-uri 'self'",
         "object-src 'none'",
         "manifest-src 'self'",

@@ -309,6 +309,10 @@ describe('Security', () => {
         const handler = Object.keys(element.attributes).find((name) => /^on[a-z]+$/i.test(name));
         assert.equal(handler, undefined, `inline handler ${handler} on <${element.tagName}>`);
       }
+      for (const form of root.querySelectorAll('form[action]')) {
+        const action = form.getAttribute('action');
+        assert.ok(/^(https:\/\/|\/)/.test(action), `form submits to an insecure target: ${action}`);
+      }
       const csp = root.querySelector('meta[http-equiv="content-security-policy"]')?.getAttribute('content');
       assert.ok(csp, 'CSP meta tag present');
       const scriptSrc = csp.match(/script-src([^;]*)/)?.[1] ?? '';
