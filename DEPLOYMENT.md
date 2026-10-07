@@ -1,77 +1,65 @@
 # Deploying payflowafrica.com
 
-The site is fully static: `npm run build` writes plain HTML, CSS and assets to `dist/`, and Cloudflare Pages serves
-them. The `payflowafrica.com` zone already uses Cloudflare nameservers (`clint.ns.cloudflare.com`,
-`barbara.ns.cloudflare.com`; checked on 7 October 2026), so no registrar changes are needed.
+The site is fully static: `npm run build` writes plain HTML, CSS and assets to `dist/`, and Cloudflare serves them as
+a Worker with static assets (configured in `wrangler.jsonc`; there is no Worker code). The code lives at
+`github.com/okweolemu/PayFlowAfrica`, and the `payflowafrica.com` zone already uses Cloudflare nameservers.
 
 > Nothing in this repository changes DNS. Every DNS step below is done by you in the Cloudflare dashboard.
 
-## 1. Build settings
-
-| Setting | Value |
-| --- | --- |
-| Framework preset | Astro (or "None"; the values below are what matter) |
-| Build command | `npm run build` |
-| Build output directory | `dist` |
-| Root directory | `/` (repository root) |
-| Node.js version | `22.16.0`, read from `.node-version` (or set `NODE_VERSION`) |
-
-No environment variables are required. The contact address lives in `src/config/site.ts`. One optional, build-time
-variable (Settings → Variables and Secrets → Production; redeploy after changing it):
-
-| Variable | Set it when |
-| --- | --- |
-| `PUBLIC_EARLY_ACCESS_ENDPOINT` | You have a working JSON endpoint for early-access requests (see README). Until then the form drafts an email to `hello@payflowafrica.com`. |
-
-Before deploying, check locally:
+## 1. Before deploying
 
 ```bash
 npm ci
 npm run verify
 ```
 
-## 2. Create the Pages project
+No environment variables are required; the contact address lives in `src/config/site.ts`. Node.js `22.16.0` is read
+from `.node-version`. The optional `PUBLIC_EARLY_ACCESS_ENDPOINT` is a build-time variable: set it under the Worker's
+**Settings → Build → Variables and secrets**, then redeploy.
 
-### Option A — Git integration (recommended)
+## 2. Create the Worker from GitHub
 
-1. Commit the project and push it to a GitHub or GitLab repository (`main` branch).
-2. Cloudflare dashboard → **Workers & Pages** → **Create application** → **Pages** → **Import an existing Git repository**.
-3. Select the repository and use the build settings above. Add `PUBLIC_EARLY_ACCESS_ENDPOINT` only if you have one.
-4. **Save and Deploy.** Each push to `main` deploys to production. Other branches get preview URLs on `*.pages.dev`,
-   which `_headers` marks `noindex`.
+Cloudflare dashboard → **Workers & Pages** → **Create application** → import the `okweolemu/PayFlowAfrica` repository,
+then fill in **Set up your application**:
 
-### Option B — Direct upload from this machine
+| Field | Value |
+| --- | --- |
+| Project name | `payflowafrica` (must match `name` in `wrangler.jsonc`) |
+| Build command | `npm run build` |
+| Deploy command | `npx wrangler deploy` |
+| Non-production branch deploy command | Leave the default |
+| Enable Preview builds | Optional. Preview URLs on `*.workers.dev` are marked `noindex` by `_headers`. |
+| Protect with Cloudflare Access | Off (the site is public) |
+| Advanced → Root directory | `/` |
+| Advanced → API token | Let Cloudflare create a new token |
+| Advanced → Variables | None needed |
 
-```bash
-npm run build
-npx wrangler login
-npx wrangler pages project create payflowafrica --production-branch main
-npx wrangler pages deploy dist --project-name payflowafrica --branch main
-```
+**Deploy.** The first build gives a `payflowafrica.<your-subdomain>.workers.dev` address. From then on, every push to
+`main` deploys automatically.
 
-With direct upload, `PUBLIC_EARLY_ACCESS_ENDPOINT` comes from your local `.env` at build time, not from the dashboard.
+To deploy from this machine instead, run `npm run build` then `npx wrangler deploy` (it reads `wrangler.jsonc`;
+`npx wrangler login` first).
+
+*Alternative: Cloudflare Pages* also works with no config. Use build command `npm run build` and output directory
+`dist`, then add both hostnames under the project's **Custom domains**.
 
 ## 3. Connect the domain
 
-In the Pages project → **Custom domains**:
-
-1. **Set up a custom domain** → `payflowafrica.com` → confirm. Because the zone is on Cloudflare, Pages creates the DNS
-   record and the TLS certificate automatically.
-2. Repeat for `www.payflowafrica.com`.
-3. Redirect `www` to the apex: **Rules → Redirect Rules → Create rule** using the "Redirect from WWW to root" template,
-   or a rule matching hostname `www.payflowafrica.com` with a dynamic 301 redirect to
-   `concat("https://payflowafrica.com", http.request.uri.path)` that preserves the query string.
+1. Worker → **Settings → Domains & Routes → Add → Custom Domain** → `payflowafrica.com`. Cloudflare creates the DNS
+   record and TLS certificate. A Custom Domain can't be added on a hostname that already has a CNAME record.
+2. `www`: under **DNS → Records**, add a proxied **A** record for `www` pointing to `192.0.2.0`. This placeholder
+   address is Cloudflare's documented pattern for redirect-only hostnames.
+3. **Rules → Redirect Rules → Create rule** from the **Redirect from WWW to root** template, or match hostname
+   `www.payflowafrica.com` with a 301 to `concat("https://payflowafrica.com", http.request.uri.path)` and query string
+   preserved.
 4. **SSL/TLS → Edge Certificates → Always Use HTTPS: On.**
-
-Don't add the CNAME records by hand before step 1. Cloudflare's docs warn that a CNAME pointing at a Pages project that
-the domain isn't associated with returns HTTP 522.
 
 ### DNS records required
 
 | Type | Name | Content | Proxy | Created by |
 | --- | --- | --- | --- | --- |
-| CNAME | `payflowafrica.com` (`@`) | `<project>.pages.dev` | Proxied | Pages, when you add the custom domain (flattened at the apex) |
-| CNAME | `www` | `<project>.pages.dev` | Proxied | Pages, when you add the custom domain |
+| Worker / custom domain | `payflowafrica.com` | the `payflowafrica` Worker | Proxied | Cloudflare, when you add the Custom Domain |
+| A | `www` | `192.0.2.0` | Proxied | You (step 2); only used for the redirect |
 
 The zone has no A, AAAA or CNAME records yet, so nothing conflicts. Leave the email records (section 4) as they are.
 
@@ -110,6 +98,8 @@ To change the public address, edit `contactEmail` in `src/config/site.ts` and re
 ## Troubleshooting
 
 - **Build fails on the Node version:** make sure `.node-version` is committed, or set `NODE_VERSION=22.16.0`.
+- **Deploy step fails on the Worker name:** the dashboard project name and `name` in `wrangler.jsonc` must match
+  (`payflowafrica`).
 - **The early-access endpoint isn't used after setting the variable:** it's build-time, so trigger a new deployment.
 - **Pages render unstyled on a local Windows build:** if the project folder is reachable through two different paths
   (an app-virtualised AppData folder, for example), Vite can't match pages to their CSS. Build from a normal folder such

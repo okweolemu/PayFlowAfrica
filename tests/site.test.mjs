@@ -323,5 +323,15 @@ describe('Security', () => {
       assert.match(headers, new RegExp(`^\\s+${name}:`, 'm'), `${name} missing`);
     }
     assert.match(headers, /pages\.dev\/\*\n\s+X-Robots-Tag: noindex/);
+    assert.match(headers, /workers\.dev\/\*\n\s+X-Robots-Tag: noindex/);
+  });
+
+  test('the Workers config serves dist/ with the branded 404 page', () => {
+    const jsonc = readFileSync(new URL('../wrangler.jsonc', import.meta.url), 'utf8');
+    const config = JSON.parse(jsonc.replace(/^\s*\/\/.*$/gm, ''));
+    assert.equal(config.name, 'payflowafrica');
+    assert.equal(config.assets.directory, './dist');
+    assert.equal(config.assets.not_found_handling, '404-page');
+    assert.equal(config.main, undefined, 'static site: no Worker script expected');
   });
 });

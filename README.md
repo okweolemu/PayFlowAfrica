@@ -18,7 +18,7 @@ availability that doesn't exist yet. See [Content status](#content-status) befor
 | JavaScript | ~5 KB (2 KB gzipped) of inline modules: mobile menu, preview tabs, scroll reveal, early-access form |
 | SEO | Per-page meta + Open Graph, canonical URLs, JSON-LD, `robots.txt`, sitemap (`@astrojs/sitemap`) |
 | Security | Hash-based Content-Security-Policy (Astro), `_headers` for Cloudflare, no third-party scripts |
-| Hosting | Cloudflare Pages (see [DEPLOYMENT.md](DEPLOYMENT.md)) |
+| Hosting | Cloudflare Workers static assets via `wrangler.jsonc`, deployed from GitHub (see [DEPLOYMENT.md](DEPLOYMENT.md)) |
 
 ## Getting started
 
@@ -46,7 +46,7 @@ npm run dev        # http://localhost:4321
 early-access form sends requests.
 
 **Early-access endpoint.** One optional, **build-time** environment variable. Copy `.env.example` to `.env` for local
-builds, or set it in Cloudflare Pages (changing it requires a redeploy).
+builds, or set it as a build variable in Cloudflare (changing it requires a redeploy).
 
 | Variable | Purpose |
 | --- | --- |
@@ -102,6 +102,7 @@ src/
 public/                   Icons, og-image.png, contour pattern, site.webmanifest, _headers
 scripts/generate-assets.mjs
 tests/site.test.mjs
+wrangler.jsonc            Cloudflare Workers config: serve dist/ as static assets, branded 404
 ```
 
 ## Editing content
@@ -138,4 +139,4 @@ The test suite fails the build if common over-claims appear (for example "truste
 - Homepage HTML is about 22 KB gzipped, CSS about 12 KB gzipped, and one 73 KB font file. There are no images on the
   page itself.
 - CSP blocks inline scripts other than Astro's hashed modules. `_headers` adds HSTS, `nosniff`, frame denial,
-  referrer and permissions policies, and `noindex` on `*.pages.dev` preview URLs.
+  referrer and permissions policies, and `noindex` on `*.workers.dev` and `*.pages.dev` preview URLs.
