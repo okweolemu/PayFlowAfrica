@@ -1,0 +1,80 @@
+---
+import '../../styles/mockup.css';
+import Banknote from '@lucide/astro/icons/banknote';
+import Bell from '@lucide/astro/icons/bell';
+import CalendarDays from '@lucide/astro/icons/calendar-days';
+import ChartColumn from '@lucide/astro/icons/chart-column';
+import ChevronDown from '@lucide/astro/icons/chevron-down';
+import HandCoins from '@lucide/astro/icons/hand-coins';
+import LayoutDashboard from '@lucide/astro/icons/layout-dashboard';
+import Search from '@lucide/astro/icons/search';
+import Settings from '@lucide/astro/icons/settings';
+import Users from '@lucide/astro/icons/users';
+import LogoMark from '../LogoMark.astro';
+import { sampleOrg } from '../../data/sample';
+
+export type AppSection = 'overview' | 'payroll' | 'employees' | 'reports';
+
+interface Props {
+  active: AppSection;
+}
+
+const { active } = Astro.props;
+
+const navGroups = [
+  {
+    label: 'Workspace',
+    items: [
+      { key: 'overview', label: 'Overview', icon: LayoutDashboard },
+      { key: 'payroll', label: 'Payroll', icon: Banknote },
+      { key: 'employees', label: 'Employees', icon: Users },
+      { key: 'leave', label: 'Leave', icon: CalendarDays },
+      { key: 'benefits', label: 'Benefits', icon: HandCoins },
+    ],
+  },
+  {
+    label: 'Insight',
+    items: [
+      { key: 'reports', label: 'Reports', icon: ChartColumn },
+      { key: 'settings', label: 'Rules & settings', icon: Settings },
+    ],
+  },
+];
+---
+
+<div class="m-app" aria-hidden="true">
+  <div class="m-top">
+    <div class="m-brand"><LogoMark class="m-brand-mark" /> PayFlow</div>
+    <div class="m-org">
+      <span class="m-hide-xs">{sampleOrg.name}</span>
+      <span class="m-demo-flag">Demo data</span>
+      <ChevronDown />
+    </div>
+    <div class="m-search"><Search /> Search employees, pay runs, reports</div>
+    <div class="m-top-end">
+      <span class="m-chip m-hide-xs">{sampleOrg.periodShort}</span>
+      <Bell class="m-hide-xs" />
+      <span class="m-avatar m-avatar--accent">PA</span>
+    </div>
+  </div>
+  <div class="m-body">
+    <div class="m-side">
+      {
+        navGroups.map((group) => (
+          <>
+            <p class="m-side-label">{group.label}</p>
+            {group.items.map((item) => (
+              <div class:list={['m-side-item', { 'is-active': item.key === active }]}>
+                <item.icon />
+                {item.label}
+              </div>
+            ))}
+          </>
+        ))
+      }
+    </div>
+    <div class="m-main">
+      <slot />
+    </div>
+  </div>
+</div>

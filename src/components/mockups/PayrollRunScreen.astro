@@ -1,0 +1,154 @@
+---
+import Check from '@lucide/astro/icons/check';
+import CircleCheck from '@lucide/astro/icons/circle-check';
+import Clock from '@lucide/astro/icons/clock';
+import TriangleAlert from '@lucide/astro/icons/triangle-alert';
+import { payrollRun } from '../../data/sample';
+import { formatChange, formatWhole } from '../../lib/format';
+
+const kpis = [
+  { label: 'Gross pay', value: payrollRun.gross },
+  { label: 'Deductions', value: payrollRun.deductions },
+  { label: 'Net pay', value: payrollRun.net },
+  { label: 'Employer contributions', value: payrollRun.employerCost },
+];
+
+const doneApprovals = payrollRun.approvals.filter((step) => step.state === 'done').length;
+---
+
+<div class="m-head">
+  <div>
+    <p class="m-title">Pay run · {payrollRun.title}</p>
+    <p class="m-subtitle">
+      Monthly payroll · {payrollRun.employees} employees · {payrollRun.currency}
+    </p>
+  </div>
+  <div class="m-actions">
+    <span class="m-badge is-warning">Awaiting approval</span>
+  </div>
+</div>
+
+<div class="m-kpis">
+  {
+    kpis.map((kpi) => (
+      <div class="m-card">
+        <p class="m-kpi-label">{kpi.label}</p>
+        <p class="m-kpi-value">
+          <span class="currency">{payrollRun.currency}</span> {formatWhole(kpi.value)}
+        </p>
+      </div>
+    ))
+  }
+</div>
+
+<div class="m-grid-2">
+  <div class="m-card">
+    <div class="m-card-head">
+      <p class="m-card-title">Pay components</p>
+      <span class="m-card-meta">Change vs September</span>
+    </div>
+    <table class="m-table">
+      <thead>
+        <tr>
+          <th>Component</th>
+          <th class="m-hide-sm">Type</th>
+          <th class="is-num m-hide-xs">Employees</th>
+          <th class="is-num">Amount</th>
+          <th class="is-num">Change</th>
+        </tr>
+      </thead>
+      <tbody>
+        {
+          payrollRun.lines.map((line) => (
+            <tr>
+              <td class:list={{ 'm-flagged': line.flag }}>{line.component}</td>
+              <td class="m-hide-sm m-muted">{line.type}</td>
+              <td class="is-num m-hide-xs m-muted">{line.count}</td>
+              <td class="is-num">{formatWhole(line.amount)}</td>
+              <td
+                class:list={[
+                  'is-num',
+                  { 'm-flagged': line.flag, 'm-down': !line.flag && (line.change ?? 0) < 0 },
+                ]}
+              >
+                {formatChange(line.change)}
+              </td>
+            </tr>
+          ))
+        }
+        <tr class="m-total-row">
+          <td>Net pay</td>
+          <td class="m-hide-sm"></td>
+          <td class="is-num m-hide-xs">{payrollRun.employees}</td>
+          <td class="is-num">{formatWhole(payrollRun.net)}</td>
+          <td class="is-num">+1.4%</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="side">
+    <div class="m-card">
+      <div class="m-card-head">
+        <p class="m-card-title">Approvals</p>
+        <span class="m-card-meta">{doneApprovals} of {payrollRun.approvals.length} complete</span>
+      </div>
+      <ol class="m-timeline">
+        {
+          payrollRun.approvals.map((step) => (
+            <li class:list={['m-timeline-item', { 'is-pending': step.state === 'pending' }]}>
+              <span class="m-timeline-dot">{step.state === 'done' ? <Check /> : <Clock />}</span>
+              <span>
+                <span class="m-strong">{step.role}</span>
+                <span class="step-meta m-muted">
+                  {step.action} · {step.when}
+                </span>
+              </span>
+            </li>
+          ))
+        }
+      </ol>
+    </div>
+
+    <div class="m-card">
+      <div class="m-card-head">
+        <p class="m-card-title">Validation</p>
+        <span class="m-card-meta">Run before review</span>
+      </div>
+      <ul class="m-list">
+        <li class="m-list-item">
+          <CircleCheck class="m-icon-ok" />
+          <span>{payrollRun.checks.passed} checks passed</span>
+        </li>
+        <li class="m-list-item">
+          <TriangleAlert class="m-icon-warn" />
+          <span>Overtime up 12.4% on September</span>
+        </li>
+        <li class="m-list-item">
+          <TriangleAlert class="m-icon-warn" />
+          <span>2 employees missing bank details</span>
+        </li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<style>
+  .currency {
+    color: var(--m-muted);
+    font-size: 0.62em;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+  }
+
+  .side {
+    display: grid;
+    gap: 0.85em;
+    align-content: start;
+  }
+
+  .step-meta {
+    display: block;
+    font-size: 0.9em;
+  }
+</style>

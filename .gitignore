@@ -1,0 +1,23 @@
+# build output
+dist/
+.astro/
+.cache/
+
+# dependencies
+node_modules/
+
+# environment — never commit real values
+.env
+.env.*
+!.env.example
+
+# logs and OS files
+npm-debug.log*
+.DS_Store
+Thumbs.db
+
+# local tooling
+.claude/
+.wrangler/
+.vscode/
+.idea/

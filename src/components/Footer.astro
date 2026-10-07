@@ -1,0 +1,138 @@
+---
+import Logo from './Logo.astro';
+import { footerNav, site } from '../config/site';
+
+const year = new Date().getFullYear();
+---
+
+<footer class="site-footer on-dark">
+  <div class="container">
+    <div class="site-footer__top">
+      <div class="site-footer__brand">
+        <a class="site-footer__logo" href="/">
+          <Logo />
+        </a>
+        <p>{site.summary}</p>
+        <p>
+          <a class="site-footer__email" href={`mailto:${site.contactEmail}`}>{site.contactEmail}</a>
+        </p>
+        <p class="site-footer__status">
+          <span class="tag">In development</span>
+          <span>Payroll &amp; HR platform</span>
+        </p>
+      </div>
+
+      <nav class="site-footer__nav" aria-label="Footer">
+        {
+          footerNav.map((group) => (
+            <div class="site-footer__group">
+              <h2 class="site-footer__heading">{group.title}</h2>
+              <ul role="list">
+                {group.links.map((link) => (
+                  <li>
+                    <a href={link.href}>{link.label}</a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))
+        }
+      </nav>
+    </div>
+
+    <div class="site-footer__bottom">
+      <p>&copy; {year} {site.name}. All rights reserved.</p>
+      <p>Product visuals on this site are design concepts populated with sample data.</p>
+    </div>
+  </div>
+</footer>
+
+<style>
+  .site-footer {
+    padding-block: clamp(3.5rem, 3rem + 3vw, 5rem) var(--space-8);
+    background: var(--ink-950);
+    font-size: var(--text-sm);
+  }
+
+  .site-footer__top {
+    display: grid;
+    gap: var(--space-12);
+    padding-bottom: var(--space-12);
+    border-bottom: 1px solid rgb(255 255 255 / 0.08);
+  }
+
+  @media (min-width: 56em) {
+    .site-footer__top {
+      grid-template-columns: minmax(0, 1.1fr) minmax(0, 1.4fr);
+    }
+  }
+
+  .site-footer__brand {
+    display: grid;
+    gap: var(--space-4);
+    align-content: start;
+    max-width: 24rem;
+  }
+
+  .site-footer__logo {
+    justify-self: start;
+    text-decoration: none;
+  }
+
+  .site-footer__email {
+    color: var(--green-300);
+    font-weight: 600;
+    text-decoration: none;
+  }
+
+  .site-footer__email:hover {
+    text-decoration: underline;
+  }
+
+  .site-footer__status {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-3);
+    color: var(--text-muted);
+  }
+
+  .site-footer__nav {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr));
+    gap: var(--space-8);
+  }
+
+  .site-footer__heading {
+    margin-bottom: var(--space-4);
+    color: var(--white);
+    font-size: var(--text-sm);
+    font-weight: 600;
+    letter-spacing: 0;
+  }
+
+  .site-footer__group ul {
+    display: grid;
+    gap: var(--space-3);
+  }
+
+  .site-footer__group a {
+    color: var(--ink-300);
+    text-decoration: none;
+  }
+
+  .site-footer__group a:hover {
+    color: var(--white);
+    text-decoration: underline;
+  }
+
+  .site-footer__bottom {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: var(--space-3) var(--space-8);
+    padding-top: var(--space-6);
+    color: var(--ink-300);
+    font-size: var(--text-xs);
+  }
+</style>

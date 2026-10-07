@@ -1,0 +1,181 @@
+---
+import Check from '@lucide/astro/icons/check';
+import SectionHeader from '../SectionHeader.astro';
+import { productAreas, roadmap } from '../../data/content';
+---
+
+<section id="platform" class="section platform" aria-labelledby="platform-title">
+  <div class="container">
+    <SectionHeader
+      id="platform-title"
+      eyebrow="The platform"
+      title="One connected platform for people, pay and process."
+      lead="PayFlow Africa is being designed as a single system for the work HR, payroll and finance teams do every month. The areas below describe the platform we’re building; scope and sequencing will be shaped with early-access organisations."
+    />
+
+    <ul class="areas" role="list">
+      {
+        productAreas.map((area, index) => (
+          <li class="area" data-reveal style={`--reveal-delay: ${(index % 3) * 70}ms`}>
+            <div class="area__top">
+              <span class="area__icon">
+                <area.icon />
+              </span>
+              {area.status && <span class="tag tag--amber">{area.status}</span>}
+            </div>
+            <h3 class="area__title">{area.title}</h3>
+            <p class="area__summary">{area.summary}</p>
+            <ul class="area__points" role="list">
+              {area.points.map((point) => (
+                <li>
+                  <Check class="area__check" />
+                  {point}
+                </li>
+              ))}
+            </ul>
+          </li>
+        ))
+      }
+    </ul>
+
+    <div class="roadmap" data-reveal>
+      <div class="roadmap__intro">
+        <h3 class="roadmap__title">Further along the roadmap</h3>
+        <p>Areas we plan to build out once the core modules are in place.</p>
+      </div>
+      <ul class="roadmap__list" role="list">
+        {roadmap.map((item) => <li>{item}</li>)}
+      </ul>
+    </div>
+  </div>
+</section>
+
+<style>
+  .platform {
+    padding-top: clamp(3.5rem, 2.5rem + 4vw, 6.5rem);
+  }
+
+  .areas {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 20rem), 1fr));
+    gap: var(--space-5);
+  }
+
+  /* Subgrid lines up titles, summaries and point lists across each row of cards. */
+  .area {
+    display: grid;
+    grid-row: span 4;
+    grid-template-rows: subgrid;
+    row-gap: var(--space-3);
+    padding: clamp(1.5rem, 1.2rem + 1vw, 2rem);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    background: var(--surface);
+    transition:
+      border-color var(--duration) ease,
+      box-shadow var(--duration) ease;
+  }
+
+  .area:hover {
+    border-color: var(--ink-200);
+    box-shadow: var(--shadow);
+  }
+
+  .area__top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: var(--space-2);
+  }
+
+  .area__icon {
+    display: grid;
+    place-items: center;
+    width: 2.75rem;
+    height: 2.75rem;
+    border-radius: 12px;
+    background: var(--green-50);
+    color: var(--green-700);
+  }
+
+  .area__icon :global(svg) {
+    width: 1.375rem;
+    height: 1.375rem;
+  }
+
+  .area__title {
+    font-size: 1.1875rem;
+    letter-spacing: -0.015em;
+  }
+
+  .area__summary {
+    color: var(--text-muted);
+  }
+
+  .area__points {
+    display: grid;
+    align-content: start;
+    gap: var(--space-2);
+    padding-top: var(--space-4);
+    border-top: 1px solid var(--border);
+    font-size: var(--text-sm);
+  }
+
+  .area__points li {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 0.6rem;
+    align-items: start;
+  }
+
+  .area__points :global(.area__check) {
+    width: 1rem;
+    height: 1rem;
+    margin-top: 0.2rem;
+    color: var(--green-600);
+  }
+
+  .roadmap {
+    display: grid;
+    gap: var(--space-6);
+    align-items: center;
+    margin-top: var(--space-8);
+    padding: clamp(1.5rem, 1.2rem + 1vw, 2rem);
+    border: 1px dashed var(--ink-200);
+    border-radius: var(--radius-lg);
+    background: var(--surface-muted);
+  }
+
+  @media (min-width: 56em) {
+    .roadmap {
+      grid-template-columns: minmax(0, 18rem) minmax(0, 1fr);
+    }
+  }
+
+  .roadmap__title {
+    font-size: 1.0625rem;
+    letter-spacing: -0.01em;
+  }
+
+  .roadmap__intro p {
+    margin-top: var(--space-1);
+    color: var(--text-muted);
+    font-size: var(--text-sm);
+  }
+
+  .roadmap__list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+  }
+
+  .roadmap__list li {
+    padding: 0.45rem 0.9rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-full);
+    background: var(--surface);
+    color: var(--ink-700);
+    font-size: var(--text-sm);
+    font-weight: 500;
+  }
+</style>

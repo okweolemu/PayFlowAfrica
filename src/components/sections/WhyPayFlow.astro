@@ -1,0 +1,308 @@
+---
+import Check from '@lucide/astro/icons/check';
+import ChevronRight from '@lucide/astro/icons/chevron-right';
+import SectionHeader from '../SectionHeader.astro';
+import { valueProps } from '../../data/content';
+import { dashboard } from '../../data/sample';
+import { lineChart } from '../../lib/chart';
+
+const spark = lineChart(dashboard.grossTrend, { width: 240, height: 64, padding: 6 });
+const flow = ['Prepare', 'Review', 'Approve', 'Pay'];
+const checks = ['Bank details complete', 'Allowances within limits', 'Pro-rating applied'];
+const currencies = ['KES', 'UGX', 'ZMW', 'GHS', 'NGN', 'ZAR', 'MWK', 'USD'];
+---
+
+<section id="why" class="section why" aria-labelledby="why-title">
+  <div class="container">
+    <SectionHeader
+      id="why-title"
+      eyebrow="Why PayFlow Africa"
+      title="What we’re designing PayFlow Africa to do for your team."
+      lead="Clear goals for the product, stated plainly, and the standard we’ll hold ourselves to as it takes shape."
+    />
+
+    <ul class="values" role="list">
+      {
+        valueProps.map((value, index) => (
+          <li class:list={['value', `value--${value.key}`]} data-reveal style={`--reveal-delay: ${(index % 3) * 70}ms`}>
+            <div class="value__copy">
+              <span class="value__icon">
+                <value.icon />
+              </span>
+              <h3 class="value__title">{value.title}</h3>
+              <p class="value__text">{value.text}</p>
+            </div>
+
+            <div class="value__visual" aria-hidden="true">
+              {value.key === 'accuracy' && (
+                <ul class="viz-checks" role="list">
+                  {checks.map((check) => (
+                    <li>
+                      <Check />
+                      {check}
+                    </li>
+                  ))}
+                </ul>
+              )}
+              {value.key === 'automation' && (
+                <div class="viz-flow">
+                  {flow.map((step, i) => (
+                    <>
+                      <span class:list={['viz-flow__step', { 'is-active': i === 2 }]}>{step}</span>
+                      {i < flow.length - 1 && <ChevronRight class="viz-flow__arrow" />}
+                    </>
+                  ))}
+                </div>
+              )}
+              {value.key === 'visibility' && (
+                <svg class="viz-spark" viewBox="0 0 240 64" preserveAspectRatio="none">
+                  <path d={spark.area} class="viz-spark__area" />
+                  <path d={spark.line} class="viz-spark__line" vector-effect="non-scaling-stroke" />
+                </svg>
+              )}
+              {value.key === 'control' && (
+                <div class="viz-audit">
+                  <span class="viz-audit__dot" />
+                  <div>
+                    <p class="viz-audit__change">Pension rate 4.5% → 5.0%</p>
+                    <p class="viz-audit__meta">Approved by Finance Director · logged</p>
+                  </div>
+                </div>
+              )}
+              {value.key === 'africa' && (
+                <div class="viz-currencies">
+                  {currencies.map((code) => (
+                    <span>{code}</span>
+                  ))}
+                </div>
+              )}
+            </div>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</section>
+
+<style>
+  .values {
+    display: grid;
+    gap: var(--space-5);
+  }
+
+  @media (min-width: 48em) {
+    .values {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .value--africa {
+      grid-column: 1 / -1;
+    }
+  }
+
+  @media (min-width: 64em) {
+    .values {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .value--africa {
+      grid-column: span 2;
+    }
+  }
+
+  .value {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: var(--space-6);
+    padding: clamp(1.5rem, 1.2rem + 1vw, 2rem);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    background: linear-gradient(180deg, var(--surface), var(--surface-muted));
+  }
+
+  .value--africa {
+    position: relative;
+    overflow: hidden;
+    border-color: var(--ink-800);
+    background: var(--ink-900);
+  }
+
+  .value--africa::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: url('/patterns/contours.svg') 70% 30% / 160% auto no-repeat;
+    opacity: 0.9;
+    pointer-events: none;
+  }
+
+  .value--africa > * {
+    position: relative;
+  }
+
+  .value--africa .value__title {
+    color: var(--white);
+  }
+
+  .value--africa .value__text {
+    color: var(--ink-300);
+  }
+
+  .value--africa .value__icon {
+    background: rgb(60 203 145 / 0.12);
+    color: var(--green-400);
+  }
+
+  .value__copy {
+    display: grid;
+    gap: var(--space-3);
+    max-width: 34rem;
+  }
+
+  .value__icon {
+    display: grid;
+    place-items: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    margin-bottom: var(--space-1);
+    border-radius: 11px;
+    background: var(--green-50);
+    color: var(--green-700);
+  }
+
+  .value__icon :global(svg) {
+    width: 1.25rem;
+    height: 1.25rem;
+  }
+
+  .value__title {
+    font-size: 1.1875rem;
+    letter-spacing: -0.015em;
+  }
+
+  .value__text {
+    color: var(--text-muted);
+  }
+
+  .value__visual {
+    font-size: 0.8125rem;
+  }
+
+  .viz-checks {
+    display: grid;
+    gap: 0.4rem;
+  }
+
+  .viz-checks li {
+    display: flex;
+    align-items: center;
+    gap: 0.55rem;
+    padding: 0.5rem 0.7rem;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--surface);
+    color: var(--ink-700);
+    font-weight: 500;
+  }
+
+  .viz-checks :global(svg) {
+    width: 0.95rem;
+    height: 0.95rem;
+    padding: 0.1rem;
+    border-radius: 50%;
+    background: var(--green-600);
+    color: var(--white);
+    stroke-width: 3;
+  }
+
+  .viz-flow {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.25rem;
+  }
+
+  .viz-flow__step {
+    padding: 0.45rem 0.55rem;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--surface);
+    color: var(--ink-600);
+    font-weight: 600;
+  }
+
+  .viz-flow__step.is-active {
+    border-color: var(--green-600);
+    background: var(--green-50);
+    color: var(--green-700);
+  }
+
+  .viz-flow :global(.viz-flow__arrow) {
+    width: 0.9rem;
+    height: 0.9rem;
+    color: var(--ink-300);
+  }
+
+  .viz-spark {
+    width: 100%;
+    height: 4.25rem;
+  }
+
+  .viz-spark__area {
+    fill: var(--green-600);
+    fill-opacity: 0.08;
+  }
+
+  .viz-spark__line {
+    fill: none;
+    stroke: var(--green-600);
+    stroke-width: 2.25;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .viz-audit {
+    display: flex;
+    gap: 0.75rem;
+    padding: 0.75rem 0.9rem;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--surface);
+  }
+
+  .viz-audit__dot {
+    flex-shrink: 0;
+    width: 0.6rem;
+    height: 0.6rem;
+    margin-top: 0.35rem;
+    border-radius: 50%;
+    background: var(--amber-500);
+    box-shadow: 0 0 0 4px var(--amber-100);
+  }
+
+  .viz-audit__change {
+    color: var(--ink-900);
+    font-weight: 600;
+  }
+
+  .viz-audit__meta {
+    color: var(--ink-500);
+  }
+
+  .viz-currencies {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.45rem;
+  }
+
+  .viz-currencies span {
+    padding: 0.4rem 0.75rem;
+    border: 1px solid rgb(255 255 255 / 0.14);
+    border-radius: 8px;
+    background: rgb(255 255 255 / 0.04);
+    color: var(--ink-100);
+    font-weight: 600;
+    letter-spacing: 0.04em;
+  }
+</style>

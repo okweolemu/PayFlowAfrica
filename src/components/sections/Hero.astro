@@ -1,0 +1,296 @@
+---
+import ArrowRight from '@lucide/astro/icons/arrow-right';
+import CircleCheck from '@lucide/astro/icons/circle-check';
+import AppFrame from '../mockups/AppFrame.astro';
+import DashboardScreen from '../mockups/DashboardScreen.astro';
+---
+
+<section class="hero" aria-labelledby="hero-title">
+  <div class="hero__stage on-dark">
+    <div class="contour-bg" aria-hidden="true"></div>
+    <div class="hero__glow" aria-hidden="true"></div>
+
+    <div class="container hero__content">
+      <p class="hero__status">
+        <span class="hero__status-dot" aria-hidden="true"></span>
+        Payroll &amp; HR platform · In development
+      </p>
+      <h1 id="hero-title" class="hero__title">
+        Payroll that works for <span class="hero__accent">Africa.</span>
+      </h1>
+      <p class="hero__lead">
+        Modern payroll and HR technology designed to help African organisations manage people, pay and processes with
+        confidence.
+      </p>
+      <div class="hero__actions">
+        <a class="btn btn--primary btn--lg" href="#early-access">Join Early Access</a>
+        <a class="btn btn--secondary btn--lg" href="#platform">
+          Explore the Platform
+          <ArrowRight />
+        </a>
+      </div>
+      <p class="hero__note">Being built for SMEs, NGOs and growing organisations across Africa.</p>
+    </div>
+  </div>
+
+  <div class="container">
+    <figure class="hero__visual">
+      <div class="hero__canvas">
+        <div class="hero__frame m-frame">
+          <AppFrame active="overview">
+            <DashboardScreen compact />
+          </AppFrame>
+        </div>
+
+        <div class="hero__float hero__float--checks" aria-hidden="true">
+          <CircleCheck class="hero__float-icon" />
+          <div>
+            <p class="hero__float-title">Validation complete</p>
+            <p class="hero__float-text">46 checks passed · 2 warnings</p>
+          </div>
+        </div>
+
+        <div class="hero__float hero__float--approvals" aria-hidden="true">
+          <p class="hero__float-title">Approvals</p>
+          <div class="hero__approvers">
+            <span class="is-done">PO</span>
+            <span class="is-done">HR</span>
+            <span>FD</span>
+          </div>
+          <p class="hero__float-text">2 of 3 complete</p>
+        </div>
+      </div>
+
+      <figcaption class="concept-caption">
+        <span class="tag tag--amber">Concept</span>
+        <span>Product concept design with sample data. PayFlow Africa is in development.</span>
+      </figcaption>
+    </figure>
+  </div>
+</section>
+
+<style>
+  .hero {
+    position: relative;
+    padding-bottom: clamp(1rem, 2vw, 2rem);
+  }
+
+  .hero__stage {
+    position: relative;
+    padding-block: clamp(4rem, 3rem + 5vw, 7.5rem) clamp(9rem, 6rem + 14vw, 19rem);
+    overflow: hidden;
+  }
+
+  .hero__glow {
+    position: absolute;
+    top: -30%;
+    left: 50%;
+    width: min(70rem, 140%);
+    aspect-ratio: 2 / 1;
+    background: radial-gradient(closest-side, rgb(60 203 145 / 0.16), transparent);
+    transform: translateX(-50%);
+    pointer-events: none;
+  }
+
+  .hero__content {
+    position: relative;
+    display: grid;
+    justify-items: center;
+    gap: var(--space-6);
+    text-align: center;
+  }
+
+  .hero__status {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.4rem 0.9rem;
+    border: 1px solid rgb(255 255 255 / 0.14);
+    border-radius: var(--radius-full);
+    background: rgb(255 255 255 / 0.04);
+    color: var(--ink-200);
+    font-size: var(--text-sm);
+    font-weight: 500;
+  }
+
+  .hero__status-dot {
+    width: 0.5rem;
+    height: 0.5rem;
+    border-radius: 50%;
+    background: var(--amber-400);
+    box-shadow: 0 0 0 4px rgb(242 184 75 / 0.18);
+  }
+
+  .hero__title {
+    max-width: 14ch;
+    font-size: var(--text-display);
+    font-weight: 680;
+    line-height: 1.02;
+    letter-spacing: -0.04em;
+  }
+
+  .hero__accent {
+    color: var(--green-400);
+  }
+
+  .hero__lead {
+    max-width: 40rem;
+    color: var(--ink-200);
+    font-size: var(--text-lg);
+  }
+
+  .hero__actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: var(--space-3);
+    margin-top: var(--space-2);
+  }
+
+  .hero__note {
+    color: var(--ink-300);
+    font-size: var(--text-sm);
+  }
+
+  .hero__visual {
+    position: relative;
+    max-width: 68rem;
+    margin: calc(-1 * clamp(7rem, 4.5rem + 12vw, 16.5rem)) auto 0;
+  }
+
+  .hero__canvas {
+    position: relative;
+  }
+
+  .hero__frame {
+    border-radius: 16px;
+    padding: 6px;
+    background: linear-gradient(180deg, rgb(255 255 255 / 0.22), rgb(255 255 255 / 0.06));
+    box-shadow:
+      0 50px 100px -30px rgb(3 10 20 / 0.55),
+      0 0 0 1px rgb(255 255 255 / 0.08);
+  }
+
+  .hero__float {
+    position: absolute;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.8rem 1rem;
+    border: 1px solid var(--ink-100);
+    border-radius: 12px;
+    background: var(--white);
+    box-shadow: var(--shadow-float);
+    font-size: 0.8125rem;
+    line-height: 1.35;
+  }
+
+  /* Both cards straddle a corner of the frame so they never cover the dashboard's figures. */
+  .hero__float--checks {
+    bottom: -1.75rem;
+    left: -3rem;
+  }
+
+  .hero__float--approvals {
+    top: -2.5rem;
+    right: -3rem;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.45rem;
+  }
+
+  .hero__float :global(.hero__float-icon) {
+    width: 1.75rem;
+    height: 1.75rem;
+    color: var(--green-600);
+  }
+
+  .hero__float-title {
+    color: var(--ink-900);
+    font-weight: 650;
+  }
+
+  .hero__float-text {
+    color: var(--ink-500);
+  }
+
+  .hero__approvers {
+    display: flex;
+  }
+
+  .hero__approvers span {
+    display: grid;
+    place-items: center;
+    width: 2rem;
+    height: 2rem;
+    margin-right: -0.4rem;
+    border: 2px solid var(--white);
+    border-radius: 50%;
+    background: var(--ink-100);
+    color: var(--ink-600);
+    font-size: 0.6875rem;
+    font-weight: 700;
+  }
+
+  .hero__approvers .is-done {
+    background: var(--green-100);
+    color: var(--green-700);
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .hero__frame {
+      animation: hero-rise 900ms var(--ease-out) both 120ms;
+    }
+
+    .hero__float--checks {
+      animation: hero-float-in 700ms var(--ease-out) both 700ms;
+    }
+
+    .hero__float--approvals {
+      animation: hero-float-in 700ms var(--ease-out) both 950ms;
+    }
+  }
+
+  @keyframes hero-rise {
+    from {
+      opacity: 0;
+      transform: translateY(28px);
+    }
+  }
+
+  @keyframes hero-float-in {
+    from {
+      opacity: 0;
+      transform: translateY(12px) scale(0.98);
+    }
+  }
+
+  @media (max-width: 72em) {
+    .hero__float--checks {
+      left: -0.75rem;
+    }
+
+    .hero__float--approvals {
+      right: -0.75rem;
+    }
+  }
+
+  @media (max-width: 47.99em) {
+    .hero__float {
+      display: none;
+    }
+
+    .hero__frame {
+      padding: 4px;
+      border-radius: 14px;
+    }
+
+    .hero__actions {
+      width: 100%;
+    }
+
+    .hero__actions .btn {
+      flex: 1 1 14rem;
+    }
+  }
+</style>

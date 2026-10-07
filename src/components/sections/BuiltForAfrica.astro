@@ -1,0 +1,151 @@
+---
+import ShieldCheck from '@lucide/astro/icons/shield-check';
+import RuleCard from '../mockups/RuleCard.astro';
+import SectionHeader from '../SectionHeader.astro';
+import { africaPrinciples } from '../../data/content';
+---
+
+<section id="built-for-africa" class="section africa on-dark" aria-labelledby="africa-title">
+  <div class="contour-bg africa__contours" aria-hidden="true"></div>
+
+  <div class="container africa__inner">
+    <div class="africa__intro">
+      <div>
+        <SectionHeader
+          id="africa-title"
+          eyebrow="Built for Africa"
+          title="Designed around how African organisations really run payroll."
+          lead="Payroll across Africa is rarely one-size-fits-all. Rules differ between countries, sectors and organisations; many teams pay in more than one currency; and every change needs a clear approval trail. PayFlow Africa is being built so these realities are handled through configuration, not custom code."
+        />
+        <aside class="africa__commitment" aria-labelledby="commitment-title">
+          <ShieldCheck class="africa__commitment-icon" />
+          <div>
+            <h3 id="commitment-title">Our approach to compliance</h3>
+            <p>
+              We’ll only describe a country configuration as supported once it has been validated against current local
+              requirements. Until then, statutory rules are presented as configurable building blocks, not as
+              compliance claims.
+            </p>
+          </div>
+        </aside>
+      </div>
+
+      <figure class="africa__visual" data-reveal>
+        <RuleCard />
+        <figcaption class="concept-caption">
+          <span class="tag tag--amber">Concept</span>
+          <span>A sample rule showing effective dates, approvals and change history.</span>
+        </figcaption>
+      </figure>
+    </div>
+
+    <ul class="principles" role="list">
+      {
+        africaPrinciples.map((principle, index) => (
+          <li class="principle" data-reveal style={`--reveal-delay: ${(index % 3) * 70}ms`}>
+            <principle.icon class="principle__icon" />
+            <h3 class="principle__title">{principle.title}</h3>
+            <p class="principle__text">{principle.text}</p>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</section>
+
+<style>
+  .africa {
+    overflow: hidden;
+  }
+
+  .africa__contours::before {
+    mask-image: radial-gradient(ellipse 70% 60% at 85% 20%, #000 20%, transparent 80%);
+  }
+
+  .africa__inner {
+    position: relative;
+  }
+
+  .africa__intro {
+    display: grid;
+    gap: clamp(2.5rem, 2rem + 3vw, 5rem);
+    align-items: center;
+  }
+
+  @media (min-width: 64em) {
+    .africa__intro {
+      grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+    }
+  }
+
+  .africa__commitment {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: var(--space-4);
+    max-width: 40rem;
+    padding: var(--space-5) var(--space-6);
+    border: 1px solid rgb(60 203 145 / 0.25);
+    border-radius: var(--radius-lg);
+    background: rgb(60 203 145 / 0.06);
+  }
+
+  .africa__commitment :global(.africa__commitment-icon) {
+    width: 1.5rem;
+    height: 1.5rem;
+    color: var(--green-400);
+  }
+
+  .africa__commitment h3 {
+    margin-bottom: var(--space-1);
+    font-size: 1rem;
+    letter-spacing: -0.01em;
+  }
+
+  .africa__commitment p {
+    color: var(--ink-200);
+    font-size: var(--text-sm);
+  }
+
+  .africa__visual {
+    max-width: 34rem;
+    width: 100%;
+    justify-self: center;
+  }
+
+  .principles {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 19rem), 1fr));
+    gap: 1px;
+    margin-top: clamp(3.5rem, 3rem + 3vw, 6rem);
+    border: 1px solid rgb(255 255 255 / 0.1);
+    border-radius: var(--radius-lg);
+    background: rgb(255 255 255 / 0.1);
+    overflow: hidden;
+  }
+
+  .principle {
+    display: grid;
+    align-content: start;
+    gap: var(--space-2);
+    padding: clamp(1.5rem, 1.25rem + 1vw, 2rem);
+    background: var(--ink-900);
+  }
+
+  .principle :global(.principle__icon) {
+    width: 1.375rem;
+    height: 1.375rem;
+    margin-bottom: var(--space-2);
+    color: var(--green-400);
+  }
+
+  .principle__title {
+    font-size: 1.0625rem;
+    letter-spacing: -0.01em;
+  }
+
+  .principle__text {
+    color: var(--ink-300);
+    font-size: var(--text-sm);
+    line-height: 1.6;
+  }
+</style>

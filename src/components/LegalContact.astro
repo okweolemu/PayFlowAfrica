@@ -1,0 +1,13 @@
+---
+import { site } from '../config/site';
+
+interface Props {
+  topic: string;
+}
+
+const { topic } = Astro.props;
+---
+
+<p>
+  If you have questions about {topic}, email us at <a href={`mailto:${site.contactEmail}`}>{site.contactEmail}</a>.
+</p>

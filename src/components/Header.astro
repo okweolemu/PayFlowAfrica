@@ -1,0 +1,217 @@
+---
+import Menu from '@lucide/astro/icons/menu';
+import X from '@lucide/astro/icons/x';
+import Logo from './Logo.astro';
+import { primaryNav } from '../config/site';
+---
+
+<header class="site-header on-dark">
+  <div class="container site-header__bar">
+    <a class="site-header__brand" href="/">
+      <Logo />
+    </a>
+
+    <button
+      class="site-header__toggle"
+      type="button"
+      aria-expanded="false"
+      aria-controls="primary-nav"
+      data-menu-toggle
+    >
+      <Menu class="site-header__icon site-header__icon--open" />
+      <X class="site-header__icon site-header__icon--close" />
+      <span class="visually-hidden">Menu</span>
+    </button>
+
+    <nav id="primary-nav" class="site-nav" aria-label="Primary" data-open="false">
+      <ul class="site-nav__list" role="list">
+        {
+          primaryNav.map((item) => (
+            <li>
+              <a class="site-nav__link" href={item.href}>
+                {item.label}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+      <a class="btn btn--primary btn--sm site-nav__cta" href="/#early-access">Join Early Access</a>
+    </nav>
+  </div>
+</header>
+
+<style>
+  .site-header {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    background: rgb(10 26 47 / 0.92);
+    border-bottom: 1px solid rgb(255 255 255 / 0.08);
+    backdrop-filter: saturate(140%) blur(12px);
+  }
+
+  .site-header__bar {
+    display: flex;
+    align-items: center;
+    gap: var(--space-6);
+    min-height: var(--header-height);
+  }
+
+  .site-header__brand {
+    display: inline-flex;
+    border-radius: var(--radius-sm);
+    text-decoration: none;
+  }
+
+  .site-header__toggle {
+    display: none;
+  }
+
+  .site-nav {
+    display: flex;
+    flex: 1;
+    align-items: center;
+    gap: var(--space-6);
+  }
+
+  .site-nav__list {
+    display: flex;
+    gap: var(--space-1);
+    margin-inline: auto;
+  }
+
+  .site-nav__link {
+    display: block;
+    padding: 0.5rem 0.75rem;
+    border-radius: var(--radius-sm);
+    color: var(--ink-200);
+    font-size: 0.9375rem;
+    font-weight: 500;
+    text-decoration: none;
+    transition: color var(--duration) ease, background-color var(--duration) ease;
+  }
+
+  .site-nav__link:hover {
+    color: var(--white);
+    background: rgb(255 255 255 / 0.06);
+  }
+
+  @media (max-width: 63.99em) {
+    .site-header__toggle {
+      display: inline-grid;
+      place-items: center;
+      width: 2.75rem;
+      height: 2.75rem;
+      margin-left: auto;
+      border: 1px solid rgb(255 255 255 / 0.16);
+      border-radius: var(--radius);
+      background: transparent;
+      color: var(--white);
+      cursor: pointer;
+    }
+
+    .site-header__toggle :global(.site-header__icon) {
+      grid-area: 1 / 1;
+      width: 1.375rem;
+      height: 1.375rem;
+    }
+
+    .site-header__toggle :global(.site-header__icon--close),
+    .site-header__toggle[aria-expanded='true'] :global(.site-header__icon--open) {
+      display: none;
+    }
+
+    .site-header__toggle[aria-expanded='true'] :global(.site-header__icon--close) {
+      display: block;
+    }
+
+    .site-nav {
+      position: absolute;
+      top: 100%;
+      right: 0;
+      left: 0;
+      display: none;
+      flex-direction: column;
+      align-items: stretch;
+      gap: var(--space-4);
+      max-height: calc(100dvh - var(--header-height));
+      padding: var(--space-4) var(--gutter) var(--space-6);
+      overflow-y: auto;
+      background: var(--ink-900);
+      border-bottom: 1px solid rgb(255 255 255 / 0.1);
+      box-shadow: 0 24px 48px -12px rgb(3 10 20 / 0.6);
+    }
+
+    .site-nav[data-open='true'] {
+      display: flex;
+    }
+
+    .site-nav__list {
+      flex-direction: column;
+      margin: 0;
+    }
+
+    .site-nav__link {
+      padding: 0.875rem 0.5rem;
+      border-bottom: 1px solid rgb(255 255 255 / 0.08);
+      border-radius: 0;
+      font-size: 1.0625rem;
+    }
+
+    .site-nav__cta {
+      min-height: 3rem;
+    }
+  }
+
+  /* Without JavaScript the menu can't open, so show the links inline instead. */
+  @media (max-width: 63.99em) and (scripting: none) {
+    .site-header__toggle {
+      display: none;
+    }
+
+    .site-nav {
+      position: static;
+      display: flex;
+      padding: 0 0 var(--space-4);
+      box-shadow: none;
+    }
+
+    .site-header__bar {
+      flex-wrap: wrap;
+    }
+  }
+</style>
+
+<script>
+  const toggle = document.querySelector<HTMLButtonElement>('[data-menu-toggle]');
+  const nav = document.getElementById('primary-nav');
+
+  if (toggle && nav) {
+    const isOpen = () => toggle.getAttribute('aria-expanded') === 'true';
+    const setOpen = (open: boolean) => {
+      toggle.setAttribute('aria-expanded', String(open));
+      nav.dataset.open = String(open);
+    };
+
+    toggle.addEventListener('click', () => setOpen(!isOpen()));
+
+    nav.addEventListener('click', (event) => {
+      if (event.target instanceof Element && event.target.closest('a')) setOpen(false);
+    });
+
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape' && isOpen()) {
+        setOpen(false);
+        toggle.focus();
+      }
+    });
+
+    document.addEventListener('click', (event) => {
+      if (isOpen() && event.target instanceof Node && !toggle.closest('header')?.contains(event.target)) {
+        setOpen(false);
+      }
+    });
+
+    window.matchMedia('(min-width: 64em)').addEventListener('change', () => setOpen(false));
+  }
+</script>

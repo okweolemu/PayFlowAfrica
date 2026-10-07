@@ -1,0 +1,35 @@
+---
+import LogoMark from './LogoMark.astro';
+---
+
+<span class="logo">
+  <LogoMark class="logo__mark" />
+  <span class="logo__word">PayFlow <span class="logo__region">Africa</span></span>
+</span>
+
+<style>
+  .logo {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.625rem;
+  }
+
+  .logo :global(.logo__mark) {
+    width: 2rem;
+    height: 2rem;
+    flex-shrink: 0;
+  }
+
+  .logo__word {
+    color: var(--text-strong);
+    font-size: 1.125rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    white-space: nowrap;
+  }
+
+  .logo__region {
+    color: var(--text-muted);
+    font-weight: 500;
+  }
+</style>

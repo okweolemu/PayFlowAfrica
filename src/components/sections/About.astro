@@ -1,0 +1,99 @@
+---
+import { aboutPillars } from '../../data/content';
+---
+
+<section id="about" class="section about" aria-labelledby="about-title">
+  <div class="container about__inner">
+    <div class="about__copy">
+      <p class="eyebrow">About</p>
+      <h2 id="about-title" class="about__title">An early-stage company with a long-term focus.</h2>
+      <p class="lead">
+        PayFlow Africa is an early-stage, founder-led technology company building payroll and HR software for
+        organisations across Africa.
+      </p>
+      <p>
+        We’re starting with the fundamentals: accurate pay, reliable records and sensible workflows. We’re building
+        carefully, in conversation with the organisations we aim to serve.
+      </p>
+      <p>
+        The product is shaped by hands-on experience with the realities of payroll and HR systems: complex allowance
+        and deduction rules, multi-step approvals, multiple currencies, and the integrations with finance systems and
+        banks that payroll depends on.
+      </p>
+    </div>
+
+    <ul class="pillars" role="list">
+      {
+        aboutPillars.map((pillar, index) => (
+          <li class="pillar" data-reveal style={`--reveal-delay: ${(index % 2) * 80}ms`}>
+            <pillar.icon class="pillar__icon" />
+            <h3 class="pillar__title">{pillar.title}</h3>
+            <p class="pillar__text">{pillar.text}</p>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</section>
+
+<style>
+  .about__inner {
+    display: grid;
+    gap: clamp(2.5rem, 2rem + 3vw, 5rem);
+    align-items: start;
+  }
+
+  @media (min-width: 64em) {
+    .about__inner {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr);
+    }
+  }
+
+  .about__copy {
+    display: grid;
+    gap: var(--space-5);
+    max-width: 38rem;
+  }
+
+  .about__title {
+    font-size: var(--text-2xl);
+    letter-spacing: -0.028em;
+  }
+
+  .about__copy > p:not(.eyebrow, .lead) {
+    color: var(--text-muted);
+  }
+
+  .pillars {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 15rem), 1fr));
+    gap: var(--space-4);
+  }
+
+  .pillar {
+    display: grid;
+    align-content: start;
+    gap: var(--space-2);
+    padding: var(--space-6);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    background: var(--surface-muted);
+  }
+
+  .pillar :global(.pillar__icon) {
+    width: 1.5rem;
+    height: 1.5rem;
+    margin-bottom: var(--space-2);
+    color: var(--green-600);
+  }
+
+  .pillar__title {
+    font-size: 1.0625rem;
+    letter-spacing: -0.01em;
+  }
+
+  .pillar__text {
+    color: var(--text-muted);
+    font-size: var(--text-sm);
+  }
+</style>

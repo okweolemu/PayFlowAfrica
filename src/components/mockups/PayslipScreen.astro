@@ -1,0 +1,297 @@
+---
+import ChevronDown from '@lucide/astro/icons/chevron-down';
+import Download from '@lucide/astro/icons/download';
+import { payslip } from '../../data/sample';
+import { formatMoney } from '../../lib/format';
+
+const sum = (rows: [string, number][]) => rows.reduce((total, [, amount]) => total + amount, 0);
+const gross = sum(payslip.earnings);
+const deductions = sum(payslip.deductions);
+const net = gross - deductions;
+
+const meta = [
+  ['Employee', payslip.employee],
+  ['Employee no.', payslip.number],
+  ['Position', payslip.position],
+  ['Department', payslip.department],
+  ['Pay date', payslip.payDate],
+  ['Payment', payslip.payment],
+];
+---
+
+<div class="m-head">
+  <div>
+    <p class="m-title">Payslips</p>
+    <p class="m-subtitle">{payslip.period} · Kenya · 102 payslips</p>
+  </div>
+  <div class="m-actions">
+    <span class="m-btn m-hide-sm">{payslip.employee} <ChevronDown /></span>
+    <span class="m-btn m-btn--primary"><Download /> Download PDF</span>
+  </div>
+</div>
+
+<div class="slip">
+  <span class="slip__watermark">Sample</span>
+
+  <div class="slip__head">
+    <div class="slip__org">
+      <span class="slip__org-mark">DO</span>
+      <div>
+        <p class="m-strong">Demo Organisation</p>
+        <p class="m-muted">Kenya entity</p>
+      </div>
+    </div>
+    <div class="slip__title">
+      <p class="slip__label">Payslip</p>
+      <p class="m-strong">{payslip.period}</p>
+    </div>
+  </div>
+
+  <dl class="slip__meta">
+    {
+      meta.map(([label, value]) => (
+        <div>
+          <dt>{label}</dt>
+          <dd>{value}</dd>
+        </div>
+      ))
+    }
+  </dl>
+
+  <div class="slip__cols">
+    <div>
+      <p class="slip__section">Earnings <span>{payslip.currency}</span></p>
+      {
+        payslip.earnings.map(([label, amount]) => (
+          <p class="slip__row">
+            <span>{label}</span>
+            <span>{formatMoney(amount)}</span>
+          </p>
+        ))
+      }
+      <p class="slip__row slip__row--total">
+        <span>Gross pay</span>
+        <span>{formatMoney(gross)}</span>
+      </p>
+    </div>
+    <div>
+      <p class="slip__section">Deductions <span>{payslip.currency}</span></p>
+      {
+        payslip.deductions.map(([label, amount]) => (
+          <p class="slip__row">
+            <span>{label}</span>
+            <span>{formatMoney(amount)}</span>
+          </p>
+        ))
+      }
+      <p class="slip__row slip__row--total">
+        <span>Total deductions</span>
+        <span>{formatMoney(deductions)}</span>
+      </p>
+    </div>
+  </div>
+
+  <p class="slip__net">
+    <span>Net pay</span>
+    <span>{payslip.currency} {formatMoney(net)}</span>
+  </p>
+
+  <div class="slip__foot">
+    <div>
+      <p class="slip__section">Employer contributions</p>
+      {
+        payslip.employer.map(([label, amount]) => (
+          <p class="slip__row">
+            <span>{label}</span>
+            <span>{formatMoney(amount)}</span>
+          </p>
+        ))
+      }
+    </div>
+    <div class="m-hide-sm">
+      <p class="slip__section">Year to date</p>
+      {
+        payslip.yearToDate.map(([label, amount]) => (
+          <p class="slip__row">
+            <span>{label}</span>
+            <span>{formatMoney(amount)}</span>
+          </p>
+        ))
+      }
+    </div>
+    <div>
+      <p class="slip__section">Leave balance</p>
+      <p class="slip__row">
+        <span>Annual leave</span>
+        <span>{payslip.leaveBalance}</span>
+      </p>
+    </div>
+  </div>
+
+  <p class="slip__generated">Generated with PayFlow Africa · Concept design · Sample data, not a real payslip</p>
+</div>
+
+<style>
+  .slip {
+    position: relative;
+    display: grid;
+    gap: 1.2em;
+    width: 100%;
+    max-width: 50em;
+    margin-inline: auto;
+    padding: 1.8em 2em;
+    border: 1px solid var(--m-border);
+    border-radius: 8px;
+    background: var(--m-surface);
+    box-shadow: 0 1px 2px rgb(10 26 47 / 0.05), 0 12px 32px -12px rgb(10 26 47 / 0.18);
+    overflow: hidden;
+  }
+
+  .slip__watermark {
+    position: absolute;
+    top: 46%;
+    left: 50%;
+    color: rgb(12 125 84 / 0.06);
+    font-size: 7em;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    transform: translate(-50%, -50%) rotate(-18deg);
+    pointer-events: none;
+  }
+
+  .slip__head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1em;
+    padding-bottom: 1.1em;
+    border-bottom: 2px solid var(--m-text);
+  }
+
+  .slip__org {
+    display: flex;
+    align-items: center;
+    gap: 0.75em;
+  }
+
+  .slip__org-mark {
+    display: grid;
+    place-items: center;
+    width: 2.6em;
+    height: 2.6em;
+    border-radius: 8px;
+    background: var(--m-info);
+    color: #fff;
+    font-weight: 700;
+  }
+
+  .slip__title {
+    text-align: right;
+  }
+
+  .slip__label {
+    color: var(--m-accent);
+    font-size: 0.85em;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  .slip__meta {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.8em 1.2em;
+  }
+
+  .slip__meta dt {
+    color: var(--m-muted);
+    font-size: 0.85em;
+  }
+
+  .slip__meta dd {
+    margin: 0;
+    font-weight: 600;
+  }
+
+  .slip__cols,
+  .slip__foot {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1.6em;
+  }
+
+  .slip__foot {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    padding-top: 1em;
+    border-top: 1px solid var(--m-border);
+  }
+
+  .slip__section {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 0.4em;
+    padding-bottom: 0.4em;
+    border-bottom: 1px solid var(--m-border);
+    color: var(--m-muted);
+    font-size: 0.82em;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  .slip__row {
+    display: flex;
+    justify-content: space-between;
+    gap: 1em;
+    padding-block: 0.28em;
+  }
+
+  .slip__row span:last-child {
+    white-space: nowrap;
+  }
+
+  .slip__row--total {
+    margin-top: 0.3em;
+    padding-top: 0.5em;
+    border-top: 1px solid var(--m-border);
+    font-weight: 650;
+  }
+
+  .slip__net {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.9em 1.1em;
+    border-radius: 8px;
+    background: var(--m-accent-soft);
+    color: var(--m-accent);
+    font-size: 1.15em;
+    font-weight: 700;
+  }
+
+  .slip__generated {
+    color: var(--m-muted);
+    font-size: 0.82em;
+    text-align: center;
+  }
+
+  @container (max-width: 640px) {
+    .slip {
+      padding: 1.2em;
+    }
+
+    .slip__meta {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .slip__cols {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 1em;
+    }
+
+    .slip__foot {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+</style>

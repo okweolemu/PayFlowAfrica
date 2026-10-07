@@ -1,0 +1,88 @@
+---
+import BaseLayout from './BaseLayout.astro';
+
+interface Props {
+  title: string;
+  description: string;
+  updated: string;
+}
+
+const { title, description, updated } = Astro.props;
+---
+
+<BaseLayout title={title} description={description}>
+  <article class="legal">
+    <header class="legal__header on-dark">
+      <div class="container legal__header-inner">
+        <p class="eyebrow">Legal</p>
+        <h1>{title}</h1>
+        <p class="legal__updated">Last updated {updated}</p>
+      </div>
+    </header>
+    <div class="container legal__body">
+      <slot />
+    </div>
+  </article>
+</BaseLayout>
+
+<style>
+  .legal__header {
+    padding-block: clamp(3rem, 2rem + 4vw, 5.5rem);
+  }
+
+  .legal__header-inner {
+    display: grid;
+    gap: var(--space-3);
+  }
+
+  .legal__header h1 {
+    font-size: var(--text-2xl);
+    letter-spacing: -0.028em;
+  }
+
+  .legal__updated {
+    color: var(--ink-300);
+    font-size: var(--text-sm);
+  }
+
+  .legal__body {
+    max-width: calc(46rem + 2 * var(--gutter));
+    padding-block: clamp(2.5rem, 2rem + 3vw, 4.5rem) var(--section-y);
+  }
+
+  .legal__body :global(h2) {
+    margin: 2.5rem 0 0.75rem;
+    font-size: 1.25rem;
+    letter-spacing: -0.015em;
+  }
+
+  .legal__body :global(h2:first-child) {
+    margin-top: 0;
+  }
+
+  .legal__body :global(p),
+  .legal__body :global(ul) {
+    margin-bottom: 1rem;
+  }
+
+  .legal__body :global(ul) {
+    padding-left: 1.25rem;
+  }
+
+  .legal__body :global(li + li) {
+    margin-top: 0.4rem;
+  }
+
+  .legal__body :global(a) {
+    color: var(--green-700);
+    font-weight: 500;
+  }
+
+  .legal__body :global(.legal__note) {
+    padding: 1rem 1.25rem;
+    border-left: 3px solid var(--amber-500);
+    border-radius: 0 var(--radius) var(--radius) 0;
+    background: var(--amber-100);
+    color: var(--ink-800);
+  }
+</style>

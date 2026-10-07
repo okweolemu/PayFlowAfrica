@@ -1,0 +1,149 @@
+---
+import ChevronDown from '@lucide/astro/icons/chevron-down';
+import Download from '@lucide/astro/icons/download';
+import Plus from '@lucide/astro/icons/plus';
+import Search from '@lucide/astro/icons/search';
+import { employees, employeeStatusTone, profile } from '../../data/sample';
+---
+
+<div class="m-head">
+  <div>
+    <p class="m-title">Employees</p>
+    <p class="m-subtitle">248 active · 4 entities</p>
+  </div>
+  <div class="m-actions">
+    <span class="m-btn m-hide-sm"><Download /> Export</span>
+    <span class="m-btn m-btn--primary"><Plus /> Add employee</span>
+  </div>
+</div>
+
+<div class="m-filters">
+  <span class="m-filter">Entity: <b>All</b> <ChevronDown /></span>
+  <span class="m-filter">Department: <b>All</b> <ChevronDown /></span>
+  <span class="m-filter m-hide-xs">Status: <b>Active</b> <ChevronDown /></span>
+  <span class="m-filter m-hide-sm"><Search /> Search by name or employee number</span>
+</div>
+
+<div class="layout">
+  <div class="m-card">
+    <table class="m-table">
+      <thead>
+        <tr>
+          <th>Employee</th>
+          <th class="m-hide-xs">Employee no.</th>
+          <th class="m-hide-sm">Department</th>
+          <th class="m-hide-sm">Entity</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        {
+          employees.map((employee, index) => (
+            <tr class:list={{ 'is-selected': index === 0 }}>
+              <td>
+                <span class="m-person">
+                  <span class="m-avatar">{employee.initials}</span>
+                  <span>
+                    {employee.name}
+                    <span class="position m-muted">{employee.position}</span>
+                  </span>
+                </span>
+              </td>
+              <td class="m-hide-xs m-muted">{employee.number}</td>
+              <td class="m-hide-sm">{employee.department}</td>
+              <td class="m-hide-sm">{employee.entity}</td>
+              <td>
+                <span class:list={['m-badge', `is-${employeeStatusTone[employee.status]}`]}>{employee.status}</span>
+              </td>
+            </tr>
+          ))
+        }
+      </tbody>
+    </table>
+  </div>
+
+  <div class="m-card profile">
+    <div class="profile__head">
+      <span class="m-avatar m-avatar--accent profile__avatar">{profile.initials}</span>
+      <div>
+        <p class="m-strong">{profile.name}</p>
+        <p class="m-muted">{profile.position} · {profile.department}</p>
+      </div>
+    </div>
+    <div class="profile__tabs">
+      <span class="is-active">Profile</span>
+      <span>Pay</span>
+      <span>Leave</span>
+      <span>Documents</span>
+    </div>
+    <dl class="m-fields">
+      {
+        profile.fields.map(([label, value]) => (
+          <div class="m-field">
+            <dt>{label}</dt>
+            <dd>{value}</dd>
+          </div>
+        ))
+      }
+    </dl>
+  </div>
+</div>
+
+<style>
+  .layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 17em;
+    gap: 0.85em;
+    align-items: start;
+  }
+
+  .position {
+    display: block;
+    font-size: 0.88em;
+    font-weight: 500;
+  }
+
+  .profile {
+    display: grid;
+    gap: 1em;
+  }
+
+  .profile__head {
+    display: flex;
+    align-items: center;
+    gap: 0.75em;
+  }
+
+  .profile__avatar {
+    width: 2.8em;
+    height: 2.8em;
+    font-size: 1em;
+  }
+
+  .profile__tabs {
+    display: flex;
+    gap: 1em;
+    border-bottom: 1px solid var(--m-border);
+    color: var(--m-muted);
+    font-weight: 550;
+  }
+
+  .profile__tabs span {
+    padding-bottom: 0.5em;
+  }
+
+  .profile__tabs .is-active {
+    color: var(--m-accent);
+    box-shadow: inset 0 -2px 0 var(--m-accent);
+  }
+
+  @container (max-width: 960px) {
+    .layout {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .profile {
+      display: none;
+    }
+  }
+</style>

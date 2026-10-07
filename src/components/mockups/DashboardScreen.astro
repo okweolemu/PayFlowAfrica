@@ -1,0 +1,146 @@
+---
+import Check from '@lucide/astro/icons/check';
+import Download from '@lucide/astro/icons/download';
+import TriangleAlert from '@lucide/astro/icons/triangle-alert';
+import { dashboard, sampleOrg } from '../../data/sample';
+import { lineChart } from '../../lib/chart';
+import { formatWhole } from '../../lib/format';
+
+interface Props {
+  /** The hero version drops the lower task list to keep the visual compact. */
+  compact?: boolean;
+}
+
+const { compact = false } = Astro.props;
+
+const spark = lineChart(dashboard.grossTrend, { width: 92, height: 32, padding: 4 });
+const largest = Math.max(...sampleOrg.entities.map((entity) => entity.grossUsd));
+const barTones = ['', 'is-alt', 'is-warm', 'is-soft'];
+---
+
+<div class="m-head">
+  <div>
+    <p class="m-title">Payroll overview</p>
+    <p class="m-subtitle">
+      {sampleOrg.period} · All entities · Reporting in {sampleOrg.reportingCurrency}
+    </p>
+  </div>
+  <div class="m-actions">
+    <span class="m-btn m-hide-sm"><Download /> Export</span>
+    <span class="m-btn m-btn--primary">Continue pay run</span>
+  </div>
+</div>
+
+<div class="m-kpis">
+  {
+    dashboard.kpis.map((kpi, index) => (
+      <div class="m-card">
+        <p class="m-kpi-label">{kpi.label}</p>
+        <p class="m-kpi-value">{kpi.value}</p>
+        <div class="m-kpi-foot">
+          <span class="m-delta">{kpi.delta}</span>
+          {index === 0 && (
+            <svg class="m-spark m-hide-xs" viewBox="0 0 92 32" preserveAspectRatio="none">
+              <path
+                d={spark.line}
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                vector-effect="non-scaling-stroke"
+              />
+            </svg>
+          )}
+        </div>
+      </div>
+    ))
+  }
+</div>
+
+<div class="m-grid-2">
+  <div class="m-card">
+    <div class="m-card-head">
+      <p class="m-card-title">October pay run</p>
+      <span class="m-badge is-info">In review</span>
+    </div>
+    <ol class="m-steps">
+      {
+        dashboard.steps.map((step) => (
+          <li class:list={['m-step', `is-${step.state}`]}>
+            <span class="m-step-dot">{step.state === 'done' && <Check />}</span>
+            <span class="m-step-label">{step.label}</span>
+            <span class="m-step-meta">{step.meta}</span>
+          </li>
+        ))
+      }
+    </ol>
+    <ul class="m-list attention">
+      {
+        dashboard.attention.map((item) => (
+          <li class="m-list-item">
+            <TriangleAlert class="m-icon-warn" />
+            <span>{item.text}</span>
+            <span class="m-link">{item.action}</span>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+
+  <div class="m-card">
+    <div class="m-card-head">
+      <p class="m-card-title">Gross pay by entity</p>
+      <span class="m-card-meta">{sampleOrg.reportingCurrency}</span>
+    </div>
+    <ul class="m-bars">
+      {
+        sampleOrg.entities.map((entity, index) => (
+          <li class="m-bar-row">
+            <span class="m-bar-label">
+              {entity.name}
+              <small>
+                {entity.currency} · {entity.employees} staff
+              </small>
+            </span>
+            <span class="m-bar-value">{formatWhole(entity.grossUsd)}</span>
+            <span class="m-bar-track">
+              <span
+                class:list={['m-bar-fill', barTones[index]]}
+                style={`--w: ${((entity.grossUsd / largest) * 100).toFixed(1)}%`}
+              />
+            </span>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</div>
+
+{
+  !compact && (
+    <div class="m-card">
+      <div class="m-card-head">
+        <p class="m-card-title">Needs your attention</p>
+        <span class="m-card-meta">This week</span>
+      </div>
+      <ul class="m-list">
+        {dashboard.tasks.map((task) => (
+          <li class="m-list-item">
+            <span class="m-count">{task.value}</span>
+            <span>{task.text}</span>
+            <span class="m-link">Open</span>
+          </li>
+        ))}
+      </ul>
+    </div>
+  )
+}
+
+<style>
+  .attention {
+    margin-top: 1.1em;
+    padding-top: 0.3em;
+    border-top: 1px solid var(--m-border);
+  }
+</style>

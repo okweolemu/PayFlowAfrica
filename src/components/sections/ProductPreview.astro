@@ -1,0 +1,272 @@
+---
+import AnalyticsScreen from '../mockups/AnalyticsScreen.astro';
+import AppFrame, { type AppSection } from '../mockups/AppFrame.astro';
+import DashboardScreen from '../mockups/DashboardScreen.astro';
+import EmployeesScreen from '../mockups/EmployeesScreen.astro';
+import PayrollRunScreen from '../mockups/PayrollRunScreen.astro';
+import PayslipScreen from '../mockups/PayslipScreen.astro';
+import SectionHeader from '../SectionHeader.astro';
+
+const screens: {
+  id: string;
+  label: string;
+  section: AppSection;
+  description: string;
+  screen: typeof DashboardScreen;
+}[] = [
+  {
+    id: 'dashboard',
+    label: 'Payroll dashboard',
+    section: 'overview',
+    description:
+      'One view of the current pay run across every entity: totals in a reporting currency, progress through each approval stage, and the issues to resolve before anyone signs off.',
+    screen: DashboardScreen,
+  },
+  {
+    id: 'employees',
+    label: 'Employees',
+    section: 'employees',
+    description:
+      'Employee records, positions, grades and employment status in one place, with the details payroll depends on kept current and access controlled by role.',
+    screen: EmployeesScreen,
+  },
+  {
+    id: 'payroll-run',
+    label: 'Payroll run',
+    section: 'payroll',
+    description:
+      'A pay run broken down by component, compared with last month, checked against validation rules and moved through a named approval chain.',
+    screen: PayrollRunScreen,
+  },
+  {
+    id: 'payslip',
+    label: 'Payslip',
+    section: 'payroll',
+    description:
+      'Clear payslips that show earnings, deductions, employer contributions and year-to-date figures in the currency each employee is paid in.',
+    screen: PayslipScreen,
+  },
+  {
+    id: 'analytics',
+    label: 'HR analytics',
+    section: 'reports',
+    description:
+      'Headcount, turnover, leave and payroll-cost trends from the same data payroll runs on, including the AI-assisted insights we’re exploring.',
+    screen: AnalyticsScreen,
+  },
+];
+---
+
+<section id="preview" class="section section--muted" aria-labelledby="preview-title">
+  <div class="container">
+    <SectionHeader
+      id="preview-title"
+      eyebrow="Product preview"
+      title="A first look at what we’re building."
+      lead="These screens are design concepts populated with sample data. They show the direction of the product, not a finished release."
+      align="center"
+    />
+
+    <div class="preview" data-tabs>
+      <div class="preview__tabs" role="tablist" aria-label="Product concept screens">
+        {
+          screens.map((item, index) => (
+            <button
+              class="preview__tab"
+              type="button"
+              role="tab"
+              id={`tab-${item.id}`}
+              aria-controls={`panel-${item.id}`}
+              aria-selected={index === 0 ? 'true' : 'false'}
+              tabindex={index === 0 ? 0 : -1}
+            >
+              {item.label}
+            </button>
+          ))
+        }
+      </div>
+
+      {
+        screens.map((item, index) => (
+          <div
+            class="preview__panel"
+            role="tabpanel"
+            id={`panel-${item.id}`}
+            aria-labelledby={`tab-${item.id}`}
+            tabindex="0"
+            hidden={index !== 0}
+          >
+            <figure class="preview__figure">
+              <div class="preview__frame m-frame">
+                <AppFrame active={item.section}>
+                  <item.screen />
+                </AppFrame>
+              </div>
+              <figcaption class="preview__caption">
+                <span class="tag tag--amber">Concept · Sample data</span>
+                <span>{item.description}</span>
+              </figcaption>
+            </figure>
+          </div>
+        ))
+      }
+    </div>
+  </div>
+</section>
+
+<style>
+  .preview {
+    display: grid;
+    gap: var(--space-8);
+  }
+
+  .preview__tabs {
+    display: flex;
+    justify-self: center;
+    gap: var(--space-1);
+    max-width: 100%;
+    padding: 0.3rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-full);
+    background: var(--surface);
+    box-shadow: var(--shadow-sm);
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .preview__tabs::-webkit-scrollbar {
+    display: none;
+  }
+
+  .preview__tab {
+    flex-shrink: 0;
+    min-height: 2.5rem;
+    padding: 0.5rem 1.05rem;
+    border: 0;
+    border-radius: var(--radius-full);
+    background: transparent;
+    color: var(--text-muted);
+    font-size: var(--text-sm);
+    font-weight: 600;
+    white-space: nowrap;
+    cursor: pointer;
+    transition:
+      background-color var(--duration) ease,
+      color var(--duration) ease;
+  }
+
+  .preview__tab:hover {
+    color: var(--text-strong);
+  }
+
+  .preview__tab[aria-selected='true'] {
+    background: var(--ink-900);
+    color: var(--white);
+  }
+
+  .preview__tab:focus-visible {
+    outline-offset: -2px;
+  }
+
+  .preview__panel {
+    border-radius: var(--radius-lg);
+  }
+
+  .preview__panel:focus-visible {
+    outline-offset: 6px;
+  }
+
+  .preview__frame {
+    padding: 6px;
+    border: 1px solid var(--ink-100);
+    border-radius: 18px;
+    background: linear-gradient(180deg, var(--white), var(--ink-50));
+    box-shadow: var(--shadow-lg);
+  }
+
+  .preview__caption {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: center;
+    gap: 0.5rem 0.875rem;
+    max-width: 52rem;
+    margin: var(--space-6) auto 0;
+    color: var(--text-muted);
+    text-align: center;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .preview__panel:not([hidden]) .preview__frame {
+      animation: preview-in 450ms var(--ease-out);
+    }
+  }
+
+  @keyframes preview-in {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+  }
+
+  /* Without JavaScript the tabs can't switch, so show every screen in sequence. */
+  @media (scripting: none) {
+    .preview__tabs {
+      display: none;
+    }
+
+    .preview__panel[hidden] {
+      display: block !important;
+    }
+  }
+
+  @media (max-width: 47.99em) {
+    .preview__tabs {
+      justify-self: stretch;
+      border-radius: var(--radius-lg);
+    }
+
+    .preview__frame {
+      padding: 4px;
+      border-radius: 14px;
+    }
+  }
+</style>
+
+<script>
+  for (const root of document.querySelectorAll<HTMLElement>('[data-tabs]')) {
+    const tabs = Array.from(root.querySelectorAll<HTMLButtonElement>('[role="tab"]'));
+
+    const select = (next: HTMLButtonElement, moveFocus: boolean) => {
+      for (const tab of tabs) {
+        const selected = tab === next;
+        tab.setAttribute('aria-selected', String(selected));
+        tab.tabIndex = selected ? 0 : -1;
+        const panel = document.getElementById(tab.getAttribute('aria-controls') ?? '');
+        if (panel) panel.hidden = !selected;
+      }
+      if (moveFocus) next.focus();
+      next.scrollIntoView({ block: 'nearest', inline: 'nearest' });
+    };
+
+    root.addEventListener('click', (event) => {
+      const tab = event.target instanceof Element ? event.target.closest<HTMLButtonElement>('[role="tab"]') : null;
+      if (tab) select(tab, false);
+    });
+
+    root.addEventListener('keydown', (event) => {
+      const current = tabs.indexOf(document.activeElement as HTMLButtonElement);
+      if (current === -1) return;
+      const last = tabs.length - 1;
+      const target = {
+        ArrowRight: current === last ? 0 : current + 1,
+        ArrowLeft: current === 0 ? last : current - 1,
+        Home: 0,
+        End: last,
+      }[event.key];
+      if (target === undefined) return;
+      event.preventDefault();
+      select(tabs[target], true);
+    });
+  }
+</script>

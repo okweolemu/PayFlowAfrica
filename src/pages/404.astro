@@ -1,0 +1,52 @@
+---
+import ArrowRight from '@lucide/astro/icons/arrow-right';
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+
+<BaseLayout title="Page not found" description="The page you were looking for could not be found." noindex>
+  <section class="not-found on-dark" aria-labelledby="not-found-title">
+    <div class="contour-bg" aria-hidden="true"></div>
+    <div class="container not-found__inner">
+      <p class="eyebrow">Error 404</p>
+      <h1 id="not-found-title">We couldn’t find that page.</h1>
+      <p class="lead">The link may be out of date, or the page may have moved.</p>
+      <div class="not-found__actions">
+        <a class="btn btn--primary" href="/">Back to the home page</a>
+        <a class="btn btn--secondary" href="/#early-access">
+          Early access
+          <ArrowRight />
+        </a>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .not-found {
+    position: relative;
+    display: grid;
+    min-height: calc(100vh - var(--header-height));
+    align-items: center;
+    padding-block: var(--section-y);
+    overflow: hidden;
+  }
+
+  .not-found__inner {
+    position: relative;
+    display: grid;
+    gap: var(--space-5);
+    justify-items: start;
+  }
+
+  .not-found h1 {
+    font-size: var(--text-2xl);
+    letter-spacing: -0.028em;
+  }
+
+  .not-found__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-3);
+    margin-top: var(--space-2);
+  }
+</style>

@@ -1,0 +1,15 @@
+---
+import { brandColors, markDot, markGlyphPath } from '../lib/brand';
+
+interface Props {
+  class?: string;
+}
+
+const { class: className } = Astro.props;
+---
+
+<svg class={className} viewBox="0 0 32 32" aria-hidden="true" focusable="false">
+  <rect width="32" height="32" rx="8" fill={brandColors.tile}></rect>
+  <path d={markGlyphPath} fill={brandColors.glyph}></path>
+  <circle cx={markDot.cx} cy={markDot.cy} r={markDot.r} fill={brandColors.dot}></circle>
+</svg>

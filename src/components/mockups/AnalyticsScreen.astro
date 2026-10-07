@@ -1,0 +1,165 @@
+---
+import ChevronDown from '@lucide/astro/icons/chevron-down';
+import Sparkles from '@lucide/astro/icons/sparkles';
+import { analytics } from '../../data/sample';
+import { lineChart } from '../../lib/chart';
+
+const totalHeadcount = analytics.departments.reduce((total, [, count]) => total + count, 0);
+const largestDepartment = Math.max(...analytics.departments.map(([, count]) => count));
+const trend = lineChart(analytics.costTrend.values, { width: 300, height: 120, padding: 12 });
+const latest = analytics.costTrend.values.at(-1);
+---
+
+<div class="m-head">
+  <div>
+    <p class="m-title">Workforce analytics</p>
+    <p class="m-subtitle">All entities · Last 12 months · Reporting in USD</p>
+  </div>
+  <div class="m-actions">
+    <span class="m-btn">Last 12 months <ChevronDown /></span>
+  </div>
+</div>
+
+<div class="m-kpis">
+  {
+    analytics.kpis.map((kpi) => (
+      <div class="m-card">
+        <p class="m-kpi-label">{kpi.label}</p>
+        <p class="m-kpi-value">{kpi.value}</p>
+        <p class:list={['m-delta', `is-${kpi.tone}`]}>{kpi.delta}</p>
+      </div>
+    ))
+  }
+</div>
+
+<div class="m-grid-even">
+  <div class="m-card">
+    <div class="m-card-head">
+      <p class="m-card-title">Headcount by department</p>
+      <span class="m-card-meta">{totalHeadcount} employees</span>
+    </div>
+    <ul class="m-bars">
+      {
+        analytics.departments.map(([department, count]) => (
+          <li class="m-bar-row">
+            <span class="m-bar-label">{department}</span>
+            <span class="m-bar-value">{count}</span>
+            <span class="m-bar-track">
+              <span class="m-bar-fill" style={`--w: ${((count / largestDepartment) * 100).toFixed(1)}%`} />
+            </span>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+
+  <div class="m-card">
+    <div class="m-card-head">
+      <p class="m-card-title">Gross payroll cost</p>
+      <span class="m-card-meta">USD {latest}k in Oct</span>
+    </div>
+    <svg class="trend" viewBox="0 0 300 120" preserveAspectRatio="none">
+      {
+        [30, 60, 90].map((y) => (
+          <line x1="0" x2="300" y1={y} y2={y} class="trend__grid" vector-effect="non-scaling-stroke" />
+        ))
+      }
+      <path d={trend.area} class="trend__area" />
+      <path d={trend.line} class="trend__line" vector-effect="non-scaling-stroke" />
+    </svg>
+    <div class="trend__axis">
+      {analytics.costTrend.months.map((month, index) => <span class:list={{ 'm-hide-sm': index % 2 === 1 }}>{month}</span>)}
+    </div>
+  </div>
+</div>
+
+<div class="insight">
+  <span class="insight__icon"><Sparkles /></span>
+  <div class="insight__body">
+    <p class="insight__tag">AI assistant · Concept</p>
+    <p class="m-strong">{analytics.insight.title}</p>
+    <p class="m-muted">{analytics.insight.text}</p>
+  </div>
+  <div class="m-actions insight__actions">
+    <span class="m-btn">Dismiss</span>
+    <span class="m-btn m-btn--primary">View breakdown</span>
+  </div>
+</div>
+
+<style>
+  .trend {
+    width: 100% !important;
+    height: 9.5em !important;
+    overflow: visible;
+  }
+
+  .trend__grid {
+    stroke: var(--m-border);
+    stroke-width: 1;
+  }
+
+  .trend__area {
+    fill: var(--m-accent);
+    fill-opacity: 0.08;
+  }
+
+  .trend__line {
+    fill: none;
+    stroke: var(--m-accent);
+    stroke-width: 2.25;
+    stroke-linejoin: round;
+    stroke-linecap: round;
+  }
+
+  .trend__axis {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 0.5em;
+    color: var(--m-muted);
+    font-size: 0.8em;
+  }
+
+  .insight {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 0.9em 1em;
+    padding: 1em 1.1em;
+    border: 1px solid #f3dfb6;
+    border-radius: 10px;
+    background: #fffdf8;
+  }
+
+  .insight__icon {
+    display: grid;
+    place-items: center;
+    width: 2.4em;
+    height: 2.4em;
+    border-radius: 8px;
+    background: var(--m-warn-soft);
+    color: var(--m-warn);
+  }
+
+  .insight__body {
+    display: grid;
+    gap: 0.2em;
+  }
+
+  .insight__tag {
+    color: var(--m-warn);
+    font-size: 0.8em;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  @container (max-width: 640px) {
+    .insight {
+      grid-template-columns: auto minmax(0, 1fr);
+    }
+
+    .insight__actions {
+      grid-column: 1 / -1;
+    }
+  }
+</style>
