@@ -16,10 +16,6 @@ const year = new Date().getFullYear();
         <p>
           <a class="site-footer__email" href={`mailto:${site.contactEmail}`}>{site.contactEmail}</a>
         </p>
-        <p class="site-footer__status">
-          <span class="tag">In development</span>
-          <span>Payroll &amp; HR platform</span>
-        </p>
       </div>
 
       <nav class="site-footer__nav" aria-label="Footer">
@@ -87,14 +83,6 @@ const year = new Date().getFullYear();
 
   .site-footer__email:hover {
     text-decoration: underline;
-  }
-
-  .site-footer__status {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: var(--space-3);
-    color: var(--text-muted);
   }
 
   .site-footer__nav {
