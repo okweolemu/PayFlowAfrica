@@ -20,6 +20,7 @@ import Sprout from '@lucide/astro/icons/sprout';
 import Target from '@lucide/astro/icons/target';
 import Users from '@lucide/astro/icons/users';
 import Workflow from '@lucide/astro/icons/workflow';
+import { site } from '../config/site';
 
 export type IconComponent = typeof Banknote;
 
@@ -195,6 +196,58 @@ export const valueProps: ValueProp[] = [
     title: 'Built for African organisations',
     text: 'Designed around multiple currencies, local requirements and the operational realities of organisations across Africa.',
     icon: MapPinned,
+  },
+];
+
+/**
+ * Shown on the home page and reused, word for word, in its structured data and in /llms.txt. Answers are plain text
+ * so they read the same everywhere; the contact address is linked automatically on the page.
+ */
+export interface Faq {
+  question: string;
+  answer: string;
+}
+
+export const faqs: Faq[] = [
+  {
+    question: 'What is PayFlow Africa?',
+    answer:
+      'PayFlow Africa is an early-stage, founder-led technology company building payroll and HR software for organisations across Africa. The platform is being designed to bring payroll, employee records, leave, benefits and deductions, and reporting together in one system.',
+  },
+  {
+    question: 'Is PayFlow Africa a payments company?',
+    answer:
+      'No. PayFlow Africa is building payroll and HR software, not a payment processor, wallet or money-transfer service. Payroll is being designed to prepare payslips and payment files for an organisation’s finance team and banks, with bank payment integrations further along the roadmap.',
+  },
+  {
+    question: 'Can my organisation use PayFlow Africa today?',
+    answer:
+      `Not yet. PayFlow Africa is in active development, and the product screens on ${site.domain} are design concepts populated with sample data. Organisations can join early access to get updates as the product takes shape and to be considered for early previews before general release.`,
+  },
+  {
+    question: 'Who is PayFlow Africa for?',
+    answer:
+      'PayFlow Africa is being built for SMEs, NGOs and growing organisations across Africa, and for the HR, payroll and finance teams who run payroll every month, including organisations with several entities, branches or programmes.',
+  },
+  {
+    question: 'Which countries does PayFlow Africa support?',
+    answer:
+      'No country configuration is described as supported yet. Country and sector requirements are being built as configuration rather than hard-coded assumptions, and we’ll only describe a country configuration as supported once it has been validated against current local requirements.',
+  },
+  {
+    question: 'Will PayFlow Africa handle payroll in more than one currency?',
+    answer:
+      'Multi-currency payroll is a core design goal. The platform is being designed so organisations can pay, report and reconcile in the currencies they actually work in, with totals across entities shown in a reporting currency.',
+  },
+  {
+    question: 'How will PayFlow Africa use AI?',
+    answer:
+      'AI-assisted HR operations are an area we’re exploring, not a finished feature. Ideas under consideration include plain-language answers about payroll and HR data, anomaly flags before a pay run is approved, and privately hosted model options where data residency matters.',
+  },
+  {
+    question: 'How do I join early access or get in touch?',
+    answer:
+      `Use the early-access form on ${site.domain}, or email ${site.contactEmail} with your name and organisation. The same address handles general enquiries, partnership ideas and product feedback.`,
   },
 ];
 

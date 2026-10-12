@@ -5,20 +5,23 @@ import '../styles/global.css';
 import Footer from '../components/Footer.astro';
 import Header from '../components/Header.astro';
 import SEO from '../components/SEO.astro';
+import type { Faq } from '../data/content';
 
 interface Props {
   title?: string;
   description?: string;
   noindex?: boolean;
+  /** Questions answered on the page, described to search engines as an FAQ. */
+  faqs?: Faq[];
 }
 
-const { title, description, noindex } = Astro.props;
+const { title, description, noindex, faqs } = Astro.props;
 ---
 
 <!doctype html>
 <html lang="en-GB">
   <head>
-    <SEO title={title} description={description} noindex={noindex} />
+    <SEO title={title} description={description} noindex={noindex} faqs={faqs} />
     <link rel="preload" href={interLatin} as="font" type="font/woff2" crossorigin />
   </head>
   <body>

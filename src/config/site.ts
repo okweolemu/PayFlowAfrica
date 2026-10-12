@@ -14,6 +14,14 @@ export const site = {
     'PayFlow Africa is building modern payroll and HR technology for African organisations, helping teams manage payroll, people and HR operations with greater accuracy and less manual work.',
   summary:
     'PayFlow Africa is building modern payroll and HR technology for organisations across Africa.',
+  tagline: 'Payroll that works for Africa.',
+  /** Other spellings people search for, given to search engines as `alternateName`. */
+  alternateNames: ['PayFlowAfrica'],
+  /**
+   * Official profiles (LinkedIn company page, X, Crunchbase, …), published in structured data as `sameAs`.
+   * Only add profiles that exist and link back to payflowafrica.com.
+   */
+  sameAs: [] as string[],
   locale: 'en_GB',
   themeColor: '#0a1a2f',
   /** Public contact address (Cloudflare Email Routing, live since 7 Oct 2026). */
@@ -50,6 +58,7 @@ export const footerNav: { title: string; links: NavItem[] }[] = [
     links: [
       { label: 'About', href: '/#about' },
       { label: 'Why PayFlow Africa', href: '/#why' },
+      { label: 'FAQ', href: '/#faq' },
       { label: 'Contact', href: '/#contact' },
     ],
   },

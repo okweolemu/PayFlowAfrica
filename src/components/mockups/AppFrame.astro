@@ -21,6 +21,9 @@ interface Props {
 
 const { active } = Astro.props;
 
+// Mockups hold fictional sample data: aria-hidden keeps it from screen readers, and data-nosnippet keeps it out of
+// search snippets and AI answers, where it could be mistaken for real figures.
+
 const navGroups = [
   {
     label: 'Workspace',
@@ -42,7 +45,7 @@ const navGroups = [
 ];
 ---
 
-<div class="m-app" aria-hidden="true">
+<div class="m-app" aria-hidden="true" data-nosnippet>
   <div class="m-top">
     <div class="m-brand"><LogoMark class="m-brand-mark" /> PayFlow</div>
     <div class="m-org">

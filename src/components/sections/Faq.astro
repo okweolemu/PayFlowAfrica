@@ -1,0 +1,137 @@
+---
+import ChevronDown from '@lucide/astro/icons/chevron-down';
+import { site } from '../../config/site';
+import { faqs } from '../../data/content';
+
+// Answers are plain text (they're reused in structured data and /llms.txt); link the contact address here.
+const segments = (answer: string) => answer.split(site.contactEmail);
+---
+
+<section id="faq" class="section section--muted faq" aria-labelledby="faq-title">
+  <div class="container faq__inner">
+    <div class="faq__intro">
+      <p class="eyebrow">FAQ</p>
+      <h2 id="faq-title" class="faq__title">Questions about PayFlow Africa</h2>
+      <p class="lead">Straight answers about what we’re building, where it stands, and how to get involved.</p>
+    </div>
+
+    <div class="faq__list">
+      {
+        faqs.map((faq, index) => (
+          <details class="faq__item" open={index === 0}>
+            <summary class="faq__question">
+              <span>{faq.question}</span>
+              <ChevronDown class="faq__icon" />
+            </summary>
+            <p class="faq__answer">
+              {/* One line, so no stray whitespace lands next to the link. */}
+              {segments(faq.answer).map((segment, i) => (
+                <>{i > 0 && <a href={`mailto:${site.contactEmail}`}>{site.contactEmail}</a>}{segment}</>
+              ))}
+            </p>
+          </details>
+        ))
+      }
+    </div>
+  </div>
+</section>
+
+<style>
+  .faq__inner {
+    display: grid;
+    gap: clamp(2rem, 1.5rem + 3vw, 4rem);
+    align-items: start;
+  }
+
+  @media (min-width: 64em) {
+    .faq__inner {
+      grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
+    }
+
+    .faq__intro {
+      position: sticky;
+      top: calc(var(--header-height) + var(--space-8));
+    }
+  }
+
+  .faq__intro {
+    display: grid;
+    gap: var(--space-4);
+    max-width: 30rem;
+  }
+
+  .faq__title {
+    font-size: var(--text-2xl);
+    letter-spacing: -0.028em;
+  }
+
+  .faq__list {
+    display: grid;
+    gap: var(--space-3);
+  }
+
+  .faq__item {
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    background: var(--surface);
+    transition:
+      border-color var(--duration) ease,
+      box-shadow var(--duration) ease;
+  }
+
+  .faq__item[open] {
+    border-color: var(--border-strong);
+    box-shadow: var(--shadow-sm);
+  }
+
+  .faq__question {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-4);
+    padding: var(--space-5) var(--space-6);
+    border-radius: inherit;
+    color: var(--text-strong);
+    font-size: var(--text-md);
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    list-style: none;
+    cursor: pointer;
+  }
+
+  .faq__question::-webkit-details-marker {
+    display: none;
+  }
+
+  .faq__question:hover {
+    color: var(--green-700);
+  }
+
+  .faq__question:focus-visible {
+    outline-offset: -2px;
+  }
+
+  .faq__question :global(.faq__icon) {
+    flex-shrink: 0;
+    width: 1.25rem;
+    height: 1.25rem;
+    color: var(--green-700);
+    transition: transform var(--duration) var(--ease-out);
+  }
+
+  .faq__item[open] :global(.faq__icon) {
+    transform: rotate(180deg);
+  }
+
+  .faq__answer {
+    max-width: 44rem;
+    padding: 0 var(--space-6) var(--space-6);
+    color: var(--text-muted);
+  }
+
+  .faq__answer a {
+    color: var(--green-700);
+    font-weight: 600;
+    overflow-wrap: anywhere;
+  }
+</style>

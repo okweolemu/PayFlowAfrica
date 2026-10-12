@@ -92,8 +92,33 @@ To change the public address, edit `contactEmail` in `src/config/site.ts` and re
 - [ ] `curl -I https://payflowafrica.com` shows `strict-transport-security`, `x-content-type-options` and `x-frame-options`.
 - [ ] A made-up path returns the branded 404 page.
 - [ ] The link preview looks right (LinkedIn Post Inspector or opengraph.xyz).
-- [ ] Optional: verify the domain in Google Search Console (DNS TXT record) and submit `sitemap-index.xml`.
+- [ ] Search engines know about the site (section 6).
 - [ ] Optional: cookieless Cloudflare Web Analytics. If enabled, update the Privacy Notice and the CSP first.
+
+## 6. Search and AI visibility
+
+A new domain isn't in any search index until a search engine discovers it, which can take weeks on its own. These
+steps make that happen in days. AI assistants answer from the same indexes (Google, Bing) plus their own crawlers, so
+they also cover AI search.
+
+1. **Google Search Console** (search.google.com/search-console) → **Add property** → **Domain** → `payflowafrica.com`.
+   Verify with the TXT record it gives you (**DNS → Records** in Cloudflare), or accept Search Console's offer to verify
+   through Cloudflare automatically. Then:
+   - **Sitemaps** → submit `https://payflowafrica.com/sitemap-index.xml`.
+   - **URL inspection** → `https://payflowafrica.com/` → **Request indexing**.
+2. **Bing Webmaster Tools** (bing.com/webmasters) → **Import from Google Search Console** (or add the site and verify by
+   DNS) → submit the same sitemap. Bing's index also serves Copilot, DuckDuckGo, Yahoo and several AI assistants.
+3. **Cloudflare → Security → Settings → AI bot policies:** keep **Search** and **Agent** crawlers on **Allow** so AI
+   search engines can index the site and assistants can open it when someone asks about PayFlow Africa. **Training** is
+   a business choice: allowing it lets future AI models learn about the company. Pages here carry no ads, so
+   "block on pages with ads" has no effect.
+4. **Profiles that link back.** Create a LinkedIn company page (and any other official profiles) pointing at
+   `https://payflowafrica.com`, then list their URLs in `sameAs` in `src/config/site.ts` so search engines connect them.
+
+Built into the site: linked structured data (Organization, WebSite, WebPage and the FAQ), a sitemap, `/llms.txt` (a
+plain-text briefing for AI assistants, kept out of search results with `X-Robots-Tag: noindex`), and `data-nosnippet`
+on the concept screens so their sample figures never appear in snippets or AI answers. Check progress in Search
+Console's **Pages** report; searching `site:payflowafrica.com` shows what Google has indexed.
 
 ## Troubleshooting
 

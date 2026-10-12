@@ -33,7 +33,7 @@ const currencies = ['KES', 'UGX', 'ZMW', 'GHS', 'NGN', 'ZAR', 'MWK', 'USD'];
               <p class="value__text">{value.text}</p>
             </div>
 
-            <div class="value__visual" aria-hidden="true">
+            <div class="value__visual" aria-hidden="true" data-nosnippet>
               {value.key === 'accuracy' && (
                 <ul class="viz-checks" role="list">
                   {checks.map((check) => (

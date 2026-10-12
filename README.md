@@ -16,7 +16,7 @@ availability that doesn't exist yet. See [Content status](#content-status) befor
 | Fonts | Inter (variable, optical sizing), self-hosted via `@fontsource-variable/inter` |
 | Icons | Lucide, rendered to inline SVG at build time (`@lucide/astro`) |
 | JavaScript | ~5 KB (2 KB gzipped) of inline modules: mobile menu, preview tabs, scroll reveal, early-access form |
-| SEO | Per-page meta + Open Graph, canonical URLs, JSON-LD, `robots.txt`, sitemap (`@astrojs/sitemap`) |
+| SEO | Per-page meta + Open Graph, canonical URLs, linked JSON-LD (Organization, WebSite, WebPage, FAQ), `robots.txt`, sitemap (`@astrojs/sitemap`), `/llms.txt` for AI assistants |
 | Security | Hash-based Content-Security-Policy (Astro), `_headers` for Cloudflare, no third-party scripts |
 | Hosting | Cloudflare Workers static assets via `wrangler.jsonc`, deployed from GitHub (see [DEPLOYMENT.md](DEPLOYMENT.md)) |
 
@@ -87,7 +87,7 @@ as-is, or the endpoint can be a small Cloudflare Worker that stores requests in 
 ```
 src/
   config/site.ts          Site name, metadata, navigation, environment handling
-  data/content.ts         Product areas, roadmap, "Built for Africa" principles, value props, about pillars
+  data/content.ts         Product areas, roadmap, "Built for Africa" principles, value props, FAQ, about pillars
   data/sample.ts          Fictional sample data for the product concept screens
   data/countries.ts       Country list for the early-access form
   components/
@@ -97,7 +97,7 @@ src/
     Header / Footer / SEO / Logo …
   layouts/                BaseLayout (head, header, footer) and LegalLayout
   lib/                    Brand mark, contour generator, chart and number helpers
-  pages/                  index, privacy, terms, 404, robots.txt
+  pages/                  index, privacy, terms, 404, robots.txt, llms.txt
   styles/                 tokens.css, global.css, mockup.css
 public/                   Icons, og-image.png, contour pattern, site.webmanifest, _headers
 scripts/generate-assets.mjs
@@ -108,6 +108,8 @@ wrangler.jsonc            Cloudflare Workers config: serve dist/ as static asset
 ## Editing content
 
 - **Copy for the product areas, principles, value props and about pillars:** `src/data/content.ts`.
+- **FAQ:** `faqs` in `src/data/content.ts`. The same text feeds the FAQ section, its structured data and `/llms.txt`,
+  so edit it only there. Keep answers self-contained: search engines and AI assistants quote them out of context.
 - **Section headlines and paragraphs:** the matching file in `src/components/sections/`.
 - **Mockup figures:** `src/data/sample.ts`. Keep totals consistent and keep everything fictional.
 - **Legal pages:** `src/pages/privacy.astro` and `src/pages/terms.astro`. Update the "Last updated" date when you change them.
@@ -125,7 +127,8 @@ Treat these as deliberate, not finished:
 - **Sample data:** "Demo Organisation", every person, employee number, amount, currency figure, approval and validation
   count in the mockups.
 - **Pending confirmation:** the founder-experience sentence in the About section, the "Our approach to compliance"
-  commitment, "Joining is free and carries no obligation", and the logo mark.
+  commitment, "Joining is free and carries no obligation", the FAQ answers (drawn from the copy above), and the logo
+  mark.
 
 The test suite fails the build if common over-claims appear (for example "trusted by", "certified", "compliant with",
 "partnered with", or "N customers"). Extend the list in `tests/site.test.mjs` rather than working around it.
@@ -135,7 +138,9 @@ The test suite fails the build if common over-claims appear (for example "truste
 - Semantic landmarks, skip link, one `h1` per page, labelled controls, visible focus styles, WAI-ARIA tabs, and a
   mobile menu that closes on Escape.
 - `prefers-reduced-motion` disables all animation; content never depends on JavaScript to be visible.
-- Product mockups are `aria-hidden`, with visible captions that describe them as concepts.
+- Product mockups are `aria-hidden`, with visible captions that describe them as concepts. They also carry
+  `data-nosnippet`, so their sample figures stay out of search snippets and AI answers.
+- Getting the site into Google, Bing and AI search: [DEPLOYMENT.md § 6](DEPLOYMENT.md#6-search-and-ai-visibility).
 - Homepage HTML is about 22 KB gzipped, CSS about 12 KB gzipped, and one 73 KB font file. There are no images on the
   page itself.
 - CSP blocks inline scripts other than Astro's hashed modules. `_headers` adds HSTS, `nosniff`, frame denial,

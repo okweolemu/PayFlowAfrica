@@ -26,6 +26,10 @@ const meta = (root, key) =>
   root.querySelector(`meta[name="${key}"]`)?.getAttribute('content') ??
   root.querySelector(`meta[property="${key}"]`)?.getAttribute('content');
 
+const graphOf = (root) => JSON.parse(root.querySelector('script[type="application/ld+json"]').text)['@graph'];
+const nodeOf = (graph, type) => graph.find((node) => [node['@type']].flat().includes(type));
+const squash = (text) => text.replace(/\s+/g, ' ').trim();
+
 const isHiddenFromAT = (element) => {
   for (let node = element; node && node.tagName; node = node.parentNode) {
     if (node.getAttribute('aria-hidden') === 'true') return true;
@@ -98,11 +102,60 @@ describe('SEO metadata', () => {
     assert.equal(root.querySelector('link[rel="canonical"]'), null);
   });
 
-  test('structured data describes the organisation', () => {
-    const json = dom['index.html'].querySelector('script[type="application/ld+json"]')?.text;
-    const data = JSON.parse(json);
-    assert.equal(data['@type'], 'Organization');
-    assert.equal(data.url, `${SITE}/`);
+  test('indexable pages allow full snippets and large image previews', () => {
+    for (const { file } of indexable) {
+      const robots = meta(dom[file], 'robots') ?? '';
+      assert.doesNotMatch(robots, /noindex|nosnippet/, `${file}: ${robots}`);
+      assert.match(robots, /max-image-preview:large/, `${file}: ${robots}`);
+    }
+  });
+
+  test('structured data describes the organisation and the website it publishes', () => {
+    const graph = graphOf(dom['index.html']);
+    const organisation = nodeOf(graph, 'Organization');
+    const website = nodeOf(graph, 'WebSite');
+    assert.equal(organisation.name, 'PayFlow Africa');
+    assert.equal(organisation.url, `${SITE}/`);
+    assert.ok(exists(new URL(organisation.logo.url).pathname.slice(1)), 'logo missing from dist');
+    assert.equal(website.name, organisation.name, 'site name shown in search results');
+    assert.equal(website.url, `${SITE}/`);
+    assert.equal(website.publisher['@id'], organisation['@id']);
+  });
+
+  for (const { path, file } of indexable) {
+    test(`${path} is described as a page of the website`, () => {
+      const graph = graphOf(dom[file]);
+      const page = nodeOf(graph, 'WebPage');
+      assert.equal(page.url, `${SITE}${path}`);
+      assert.equal(page.name, dom[file].querySelector('title').text);
+      assert.equal(page.isPartOf['@id'], nodeOf(graph, 'WebSite')['@id']);
+    });
+  }
+});
+
+describe('FAQ', () => {
+  const root = dom['index.html'];
+  const visible = root.querySelectorAll('#faq details').map((item) => ({
+    question: squash(item.querySelector('summary').text),
+    answer: squash(item.querySelector('.faq__answer').text),
+  }));
+
+  test('the home page answers common questions about the company', () => {
+    assert.ok(visible.length >= 5, `found ${visible.length} questions`);
+    assert.ok(visible.some(({ question }) => /^What is PayFlow Africa\?$/.test(question)));
+    assert.ok(root.querySelector('footer a[href="/#faq"]'), 'footer links to the FAQ');
+  });
+
+  test('FAQ structured data matches the visible questions and answers', () => {
+    const page = nodeOf(graphOf(root), 'FAQPage');
+    assert.ok(page, 'no FAQPage in the structured data');
+    const marked = page.mainEntity.map((entry) => ({ question: entry.name, answer: entry.acceptedAnswer.text }));
+    assert.deepEqual(marked, visible);
+  });
+
+  test('llms.txt carries the same questions', () => {
+    const llms = read('llms.txt');
+    for (const { question } of visible) assert.ok(llms.includes(`### ${question.replace(/’/g, "'")}`), question);
   });
 });
 
@@ -112,6 +165,16 @@ describe('Crawling and assets', () => {
     assert.match(robots, /^User-agent: \*$/m);
     assert.match(robots, /^Allow: \/$/m);
     assert.match(robots, new RegExp(`^Sitemap: ${SITE}/sitemap-index.xml$`, 'm'));
+  });
+
+  test('llms.txt briefs AI assistants in plain ASCII and links every public page', () => {
+    const llms = read('llms.txt');
+    assert.match(llms, /^# PayFlow Africa\n\n> PayFlow Africa is building /);
+    assert.match(llms, /^[\t\n\r\x20-\x7E]*$/, 'non-ASCII character in llms.txt');
+    assert.match(llms, /not yet generally available/);
+    assert.match(llms, /design concepts populated with sample data/);
+    assert.match(llms, /^- Email: [^\s@]+@payflowafrica\.com$/m);
+    for (const { path } of indexable) assert.ok(llms.includes(`](${SITE}${path})`), `llms.txt doesn't link ${path}`);
   });
 
   test('the sitemap lists every public page and nothing else', () => {
@@ -237,12 +300,26 @@ describe('Honest content', () => {
     /\bTODO\b|\bTBD\b/,
   ];
 
+  const assertHonest = (text) => {
+    for (const pattern of overclaims) {
+      const match = text.match(pattern);
+      assert.equal(match, null, `"${match?.[0]}" found: …${text.slice(Math.max(0, (match?.index ?? 0) - 60), (match?.index ?? 0) + 60)}…`);
+    }
+  };
+
   for (const { path, file } of allPages) {
-    test(`${path} makes no unsupported claims`, () => {
-      const text = visibleText(dom[file]);
-      for (const pattern of overclaims) {
-        const match = text.match(pattern);
-        assert.equal(match, null, `"${match?.[0]}" found: …${text.slice(Math.max(0, (match?.index ?? 0) - 60), (match?.index ?? 0) + 60)}…`);
+    test(`${path} makes no unsupported claims`, () => assertHonest(visibleText(dom[file])));
+  }
+
+  test('llms.txt makes no unsupported claims', () => assertHonest(read('llms.txt')));
+
+  for (const { path, file } of allPages) {
+    test(`${path}: text hidden from assistive tech is kept out of search snippets`, () => {
+      for (const element of dom[file].querySelectorAll('[aria-hidden="true"]')) {
+        if (!element.text.trim()) continue;
+        let node = element;
+        while (node?.tagName && !node.hasAttribute('data-nosnippet')) node = node.parentNode;
+        assert.ok(node?.tagName, `sample or hidden text without data-nosnippet: "${squash(element.text).slice(0, 60)}"`);
       }
     });
   }
@@ -277,8 +354,7 @@ describe('Contact and early-access configuration', () => {
     const address = addressOf(contactLink);
     assert.match(address, /^[^\s@]+@payflowafrica\.com$/);
     assert.ok(root.querySelector(`footer a[href="mailto:${address}"]`), 'footer is missing the contact address');
-    const data = JSON.parse(root.querySelector('script[type="application/ld+json"]').text);
-    assert.equal(data.email, address);
+    assert.equal(nodeOf(graphOf(root), 'Organization').email, address);
   });
 
   test('only one contact address is used across the site', () => {
@@ -328,6 +404,7 @@ describe('Security', () => {
     }
     assert.match(headers, /pages\.dev\/\*\n\s+X-Robots-Tag: noindex/);
     assert.match(headers, /workers\.dev\/\*\n\s+X-Robots-Tag: noindex/);
+    assert.match(headers, /^\/llms\.txt\n\s+X-Robots-Tag: noindex/m);
   });
 
   test('the Workers config serves dist/ with the branded 404 page', () => {
